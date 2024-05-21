@@ -1,0 +1,26 @@
+{
+  "name": "NekoBot",
+  "version": "1.0.0",
+  "author": "NekoSenpai69",
+  "main": "src/index.js",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "@whiskeysockets/baileys": "6.7.2",
+    "better-sqlite3": "^10.0.0",
+    "cli-color": "^2.0.4",
+    "events": "^3.3.0",
+    "figlet": "^1.7.0",
+    "file-type": "^19.0.0",
+    "pino": "^8.19.0",
+    "quick.db": "^9.1.7",
+    "retry": "^0.13.1",
+    "uuid": "^9.0.1"
+  }
+}

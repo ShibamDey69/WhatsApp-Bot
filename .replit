@@ -1,0 +1,21 @@
+entrypoint = "src/index.js"
+hidden = [".config", "package-lock.json"]
+modules = ["nodejs-20:v8-20230920-bd784b9"]
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
+
+[nix]
+channel = "stable-23_05"
+
+[unitTest]
+language = "nodejs"
+
+[deployment]
+run = ["npm", "start"]
+deploymentTarget = "cloudrun"
+ignorePorts = false
+
+[[ports]]
+localPort = 6379
+externalPort = 80
