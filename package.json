@@ -20,6 +20,7 @@
     "figlet": "^1.7.0",
     "file-type": "^19.0.0",
     "instagram-url-direct": "^1.0.16",
+    "mongoose": "^8.4.0",
     "pino": "^8.19.0",
     "quick.db": "^9.1.7",
     "retry": "^0.13.1",

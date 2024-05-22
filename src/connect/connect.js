@@ -11,7 +11,7 @@ import { fileTypeFromBuffer } from "file-type";
 import Connection from "../utils/connection.js";
 import loadCommands from "../utils/commands.js";
 import Log from "../utils/logs.js";
-import AuthenticationFromFile from "../connect/auth.js";
+import AuthenticationFromMongo from "../connect/auth.js";
 import pkg from "@whiskeysockets/baileys";
 const { proto } = pkg;
 const META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
@@ -28,14 +28,12 @@ class NekoEmit extends EventEmitter {
     this.logger = logger;
   }
   async connect() {
-    if (!fs.existsSync(`src/${this.socketConfig.session}`)) {
-      fs.promises.mkdir(`src/${this.socketConfig.session}`);
-    }
-    const SingleAuth = new AuthenticationFromFile(
-      `${this.socketConfig.session}/neko`,
+
+    const SingleAuth = new AuthenticationFromMongo(
+      `${this.socketConfig.session}`,
     );
     const { saveCreds, clearState, state } =
-      await SingleAuth.useFileAuth("src");
+      await SingleAuth.useMongoAuth();
 
     const { version, isLatest } = await fetchLatestWaWebVersion({});
     const Neko = makeWASocket({

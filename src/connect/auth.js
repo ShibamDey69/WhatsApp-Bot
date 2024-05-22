@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs';
+import sessionSchema from "./authSchema.js";
 import proto,{
     BufferJSON,
     initAuthCreds,
@@ -15,9 +15,9 @@ class FileStorage {
         }
 
         try {
-            const fileContent = await fs.readFile(fileName, 'utf-8')
-            if (fileContent.length > 0) {
-                const content = JSON.parse(fileContent, BufferJSON.reviver)
+            const fileContent = await sessionSchema.findOne({sessionId: fileName})
+            if (fileContent.session.length > 0) {
+                const content = JSON.parse(fileContent.session, BufferJSON.reviver)
                 this.fileCache.set(fileName, content)
                 return content
             }
@@ -29,21 +29,36 @@ class FileStorage {
     }
 
     async saveFile(fileName, content) {
-        const serializedContent = JSON.stringify(content, BufferJSON.replacer, 2)
-         await fs.writeFile(fileName, serializedContent)
+        const serializedContent = JSON.stringify(content, BufferJSON.replacer, 2);
+
+        // Check if session with fileName exists
+        let session = await sessionSchema.findOne({ sessionId: fileName });
+
+        if (session) {
+            // If session exists, update it
+            session.session = serializedContent;
+            await session.save();
+        } else {
+            // If session doesn't exist, create a new one
+            session = await new sessionSchema({
+                sessionId: fileName,
+                session: serializedContent
+            }).save();
+        }
+
+        return session;
     }
 
     async deleteFile(fileName) {
         try {
-        await fs.unlink(fileName)
+        await sessionSchema.deleteOne({sessionId:fileName})
         } catch (error) {
             // Do nothing if the file does not exist
         }
     }
 }
 
-
-export default class AuthenticationFromFile {
+export default class AuthenticationFromMongo {
     constructor(sessionId) {
         this.sessionId = sessionId
         this.fileStorage = new FileStorage()
@@ -75,9 +90,9 @@ export default class AuthenticationFromFile {
         }
     }
 
-    async useFileAuth(folder) {
-  if(!folder || !this.sessionId) return `Provide a valid session folder`
-        const fileName = `./${folder}/${this.sessionId}.json`
+    async useMongoAuth() {
+  if(!this.sessionId) return `Provide a valid session folder`
+        const fileName = `${this.sessionId}`
 
         let storedCreds = await this.fileStorage.loadFile(fileName)
         let creds = storedCreds?.creds || initAuthCreds()
