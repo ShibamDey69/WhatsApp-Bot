@@ -3,7 +3,7 @@ export default {
   aliases: ["en"],
   description: "Enable a group feature",
   category: "group",
-  usage: "enable",
+  usage: "enable <option>",
   cooldown: 5,
   isAdmin: true,
   isBotAdmin: true,

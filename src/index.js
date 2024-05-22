@@ -6,20 +6,20 @@ import groupHandler from "./Handlers/group.js";
 
 (async () => {
   try {
-  const Neko = new NekoEmit({
-    session: "Auth-Info",
-    printQRInTerminal: false,
-  });
+    const Neko = new NekoEmit({
+      session: "Auth-Info",
+      printQRInTerminal: false,
+    });
 
-  await Neko.connect();
+    await Neko.connect();
 
-  Neko.on("messages", async(m)=> messageHandler(Neko,m));
+    Neko.on("messages", async (m) => messageHandler(Neko, m));
 
-  Neko.on("groups", async(m) => groupHandler(Neko, m));
+    Neko.on("groups", async (m) => groupHandler(Neko, m));
 
-  //Neko.on("call", callHandler);
+    //Neko.on("call", callHandler);
 
-  //Neko.on("status", statusHandler);
+    //Neko.on("status", statusHandler);
   } catch (error) {
     console.log(error);
   }

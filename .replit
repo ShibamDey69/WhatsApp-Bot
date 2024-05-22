@@ -1,6 +1,6 @@
 entrypoint = "src/index.js"
 hidden = [".config", "package-lock.json"]
-modules = ["nodejs-20:v8-20230920-bd784b9"]
+modules = ["nodejs-20:v8-20230920-bd784b9", "python-3.10:v25-20230920-d4ad2e4"]
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
@@ -19,3 +19,12 @@ ignorePorts = false
 [[ports]]
 localPort = 6379
 externalPort = 80
+
+[rules]
+
+[rules.formatter]
+
+[rules.formatter.fileExtensions]
+
+[rules.formatter.fileExtensions.".js"]
+id = "module:nodejs-20/formatter:prettier"
