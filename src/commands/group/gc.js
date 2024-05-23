@@ -44,8 +44,8 @@ export default {
 
       switch (args[0].toLowerCase()) {
         case "--leave":
+          await Neko.sendMentionMessage(M.from, "*Bye Bye Guys!*",M.groupMeta.participants.map(v=>v.id), M);
           await Neko.groupLeave(M.from);
-          Neko.sendTextMessage(M.from, "*Left the group successfully!*", M);
           break;
         case "--info":
           const metadata = await Neko.groupMetadata(M.from);

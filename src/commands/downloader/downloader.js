@@ -38,12 +38,10 @@ export default {
         const instaRegex = new RegExp(
           "https?:\\/\\/(?:www\\.)?instagram\\.com\\/(?:p|tv|reel)\\/[\\w-]+\\/?",
         );
-        const ytRegex = new RegExp(
-          "https?:\\/\\/(?:www\\.)?youtu\\.be\\/(?:watch\\?v=|embed\\/|v\\/)?[\\w-]+"
-        );
+        const ytRegex = "youtu"
         if (instaRegex.test(url)) {
           return "insta";
-        } else if (ytRegex.test(url)) {
+        } else if (url.includes(ytRegex)) {
           return "yt";
         } else {
           return false;
@@ -106,7 +104,7 @@ export default {
           return await Neko.sendVideoMessage(M.from, data.videoUrl, M);
         }
       } else {
-        return await Neko.sendTextMessage(M.from, "*Inavlid* Url Provided!", M);
+        return await Neko.sendTextMessage(M.from, "*Inavlid Url Provided!*", M);
       }
     } catch (error) {
       console.log(error);
