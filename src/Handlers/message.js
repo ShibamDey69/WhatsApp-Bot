@@ -234,7 +234,7 @@ const messageHandler = async (Neko, m) => {
               return;
             }
 
-            if (cmd?.isBotAdmin && !M?.isMod && !M.isBotAdmin) {
+            if (cmd?.isBotAdmin && !M.isBotAdmin) {
               await Neko.sendTextMessage(
                 M.from,
                 "The Bot Must Be an Admin To use This Command",
@@ -252,15 +252,6 @@ const messageHandler = async (Neko, m) => {
               return;
             }
 
-            if (cmd?.isBotAdmin && !M?.isBotAdmin && !M?.isGroup) {
-              await Neko.sendTextMessage(
-                M.from,
-                "The Bot Must Be a Group Admin To use This Command",
-                M,
-              );
-              return;
-            }
-
             if (!M?.isGroup && (!M?.isMod || !M?.isPro)) {
               await Neko.sendTextMessage(
                 M.from,
@@ -272,14 +263,14 @@ const messageHandler = async (Neko, m) => {
             await cooldown(M?.sender, 5000, cmd.run, Neko, M);
           } else {
             if (M.from) {
-              await Neko.sendReactMessage(M.from, "⚔️", M);
+              await Neko.sendReactMessage(M.from, "❌", M);
               await Neko.sendTextMessage(M.from, "Command not found!", M);
             }
             return;
           }
         }
           } catch (error) {
-        if (error.data === 429) {
+        if (error.data == 429) {
           let retryAfter = error.data?.headers?.["retry-after"] * 1000 || 30000;
           if (retryAfter) {
             return await new Promise((resolve) =>
@@ -287,7 +278,7 @@ const messageHandler = async (Neko, m) => {
             );
           }
         }
-        if (error.data === 403) return;
+        if (error.data == 403) return;
         if (operation.retry(error)) {
           Neko.log("error", `Attempt ${currentAttempt} failed. Retrying...`);
           if (currentAttempt === 3) {
