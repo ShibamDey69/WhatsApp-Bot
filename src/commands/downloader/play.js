@@ -1,7 +1,7 @@
 import All from "@fongsidev/scraper";
 import yts from "yt-search";
 import YT from "../../utils/YT.js";
-import axios from "axios";
+
 export default {
   name: "play",
   alias: ["p"],
@@ -37,7 +37,11 @@ export default {
           M,
         );
       }
-      const { url } = data.all[0];
+      
+      const videos = data.all.filter((v) => v.seconds < 460);
+      const topFive = arr => [...arr].sort((a, b) => b.views - a.views).slice(0, 5)
+      
+      let {url} = topFive(videos)[(~~(Math.random() * 5))];
       
       if (M.args.includes("--video") || M.args.includes("-v")) {
         const ytData = await All.YouTube.down(url);

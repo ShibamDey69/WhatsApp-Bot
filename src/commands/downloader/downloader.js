@@ -39,7 +39,7 @@ export default {
           "https?:\\/\\/(?:www\\.)?instagram\\.com\\/(?:p|tv|reel)\\/[\\w-]+\\/?",
         );
         const ytRegex = new RegExp(
-          "((http://)?)(www.)?((youtube.com/)|(youtu.be)|(youtube)).+",
+          "https?:\\/\\/(?:www\\.)?youtu\\.be\\/(?:watch\\?v=|embed\\/|v\\/)?[\\w-]+"
         );
         if (instaRegex.test(url)) {
           return "insta";

@@ -6,21 +6,19 @@ import mongoose from "mongoose";
 
 (async () => {
   try {
-    
-  let mongo = await mongoose.connect(process.env.MONGODB)
+    let mongo = await mongoose.connect(process.env.MONGODB);
     if (mongo) {
       const Neko = new NekoEmit({
-      session: "lily",
-      printQRInTerminal: false,
-    });
-    
-    await Neko.connect();
+        session: "lily",
+        printQRInTerminal: false,
+      });
 
-    Neko.on("messages", async (m) => messageHandler(Neko, m));
+      await Neko.connect();
 
-    Neko.on("groups", async (m) => groupHandler(Neko, m));
+      Neko.on("messages", async (m) => messageHandler(Neko, m));
+
+      Neko.on("groups", async (m) => groupHandler(Neko, m));
     }
-    
 
     //Neko.on("call", callHandler);
 

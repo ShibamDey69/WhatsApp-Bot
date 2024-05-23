@@ -38,6 +38,7 @@ const sequilizer = async (Neko, m) => {
            : m.from;
       m.groupMeta = m.isGroup ? await Neko?.groupMetadata(m.from) : "";
       m.groupOwner = m.groupMeta?.owner;
+      m.participants = m.isGroup ? m.groupMeta?.participants : [];
       m.admins = m.isGroup
          ? m.groupMeta.participants
               .filter((v) => v.admin === "admin" || v.admin === "superadmin")
@@ -75,7 +76,8 @@ const sequilizer = async (Neko, m) => {
       m.mention = m.message?.[m.messageType]?.contextInfo?.mentionedJid || [];
       m.quoted = {
          message: m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
-         sender: m.message?.extendedTextMessage?.contextInfo?.participant
+         sender: m.message?.extendedTextMessage?.contextInfo?.participant,
+         text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation
       };
       m.isMentioned = m.mention.length !== 0;
       m.isQuoted = m.quoted?.message ? true : false;
