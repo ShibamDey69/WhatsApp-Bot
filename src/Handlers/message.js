@@ -168,9 +168,9 @@ const messageHandler = async (Neko, m) => {
 
         if (isCmd) {
           let M = await sequilizer(Neko, m);
+          console.log(gc.mode,M.isMod);
           if(gc.mode === "private" && !M.isMod) return;
           if(gc.mode === "admin" && (!M.isAdmin ||!M.isMod)) return;
-          if(gc.mode === "public")  {
           
           Neko.user_db = user_db;
           if (M.quoted.sender || M.mention[0]) {
@@ -279,7 +279,6 @@ const messageHandler = async (Neko, m) => {
             return;
           }
         }
-      }
           } catch (error) {
         if (error.data === 429) {
           let retryAfter = error.data?.headers?.["retry-after"] * 1000 || 30000;
