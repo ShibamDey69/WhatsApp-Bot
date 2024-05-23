@@ -168,7 +168,6 @@ const messageHandler = async (Neko, m) => {
 
         if (isCmd) {
           let M = await sequilizer(Neko, m);
-          console.log(gc.mode,M.isMod);
           if(gc.mode === "private" && !M.isMod) return;
           if(gc.mode === "admin" && (!M.isAdmin ||!M.isMod)) return;
           

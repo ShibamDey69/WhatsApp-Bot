@@ -13,55 +13,37 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      let user = M.isQuoted ? M.quoted.sender : M.mention[0];
+      let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
       let args = M.args;
       let action = args.includes("--accept")
         ? "accept"
         : args.includes("--reject")
           ? "reject"
           : args;
-
-      if (!user) {
+      if (!user)
         return Neko.sendTextMessage(
           M.from,
           "Please mention or quote a user to marry.",
           M,
         );
-      }
 
       let sender = await Neko.user_db.getUser(M.sender.split("@")[0]);
       let receiver = await Neko.user_db.getUser(user.split("@")[0]);
 
-      // Handling marriage requests
       if (action === "accept") {
-        if (!receiver?.proposal?.includes(M.sender)) {
-          return Neko.sendTextMessage(
-            M.from,
-            "No marriage request found from this user.",
-            M
-          );
-        }
-
-        if (sender.isMarried) {
+        if (
+          !sender?.proposal?.includes(receiver.user_id) ||
+          sender.isMarried ||
+          receiver.isMarried
+        )
           return Neko.sendMentionMessage(
             M.from,
-            `You are already married to *@${sender.partner.split("@")[0]}*... don't be a cheater 😕 baka..!`,
-            [sender.partner],
+            getErrorMessage(sender, receiver),
             M,
           );
-        }
-        if (receiver.isMarried) {
-          return Neko.sendMentionMessage(
-            M.from,
-            `*@${receiver.user_id.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
-            [receiver.user_id, receiver.partner],
-            M,
-          );
-        }
 
         await Neko.user_db.setMarried(M.sender, user, true);
         await Neko.user_db.setMarried(user, M.sender, true);
-
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* and *@${user.split("@")[0]}* are now married!`,
@@ -69,16 +51,14 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!receiver.proposal?.includes(M.sender)) {
+        if (!sender.proposal?.includes(receiver.user_id))
           return Neko.sendTextMessage(
             M.from,
             "No marriage request found from this user.",
-            M
+            M,
           );
-        }
 
-        await Neko.user_db.rejectProposal(user, M.sender);
-
+        await Neko.user_db.rejectProposal(M.sender, user);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* has rejected the marriage proposal from *@${user.split("@")[0]}*`,
@@ -86,25 +66,20 @@ export default {
           M,
         );
       } else {
-        if (sender.isMarried) {
+        if (
+          sender.partner === receiver.user_id ||
+          sender.user_id === receiver.user_id ||
+          sender.isMarried ||
+          receiver.isMarried ||
+          sender.proposal?.includes(receiver.user_id)
+        )
           return Neko.sendMentionMessage(
             M.from,
-            `You are already married to *@${sender.partner.split("@")[0]}*... don't be a cheater 😕 baka..!`,
-            [sender.partner],
+            getErrorMessage(sender, receiver),
             M,
           );
-        }
-        if (receiver.isMarried) {
-          return Neko.sendMentionMessage(
-            M.from,
-            `*@${receiver.user_id.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
-            [receiver.user_id, receiver.partner],
-            M,
-          );
-        }
 
         await Neko.user_db.addProposal(user, M.sender);
-
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* has sent a marriage request to *@${user.split("@")[0]}*`,
@@ -117,4 +92,18 @@ export default {
       throw new Error(error);
     }
   },
+};
+
+const getErrorMessage = (sender, receiver) => {
+  if (sender.partner === receiver.user_id)
+    return `*@${sender.user_id.split("@")[0]}* is already married to *@${receiver.user_id.split("@")[0]}*`;
+  if (sender.user_id === receiver.user_id)
+    return `*@${sender.user_id.split("@")[0]}* can't marry himself...`;
+  if (sender.isMarried)
+    return `You are already married to *@${sender.partner.split("@")[0]}*... don't be a cheater 😕 baka..!`;
+  if (receiver.isMarried)
+    return `Sorry You are quite late😔 *@${receiver.user_id.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`;
+  if (sender?.proposal?.includes(receiver.user_id))
+    return `*@${sender.user_id.split("@")[0]}* has already sent a marriage proposal to *@${receiver.user_id.split("@")[0]}*`;
+  return "No marriage request found from this user.";
 };

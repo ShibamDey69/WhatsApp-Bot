@@ -226,9 +226,9 @@ class NekoEmit extends EventEmitter {
     );
   };
 
-  downloadMediaContent = async (m) => {
+  downloadMediaContent = async (Neko,M) => {
     const stream = await downloadMediaMessage(
-      m,
+      M,
       "buffer",
       {},
       {
