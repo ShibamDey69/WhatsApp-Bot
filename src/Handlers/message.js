@@ -71,7 +71,7 @@ class Queue {
         await this.processItem(func, ...args);
         await this.saveQueueToFile(); // Save queue data after processing each item
       } catch (error) {
-        fs.unlinkSync(this.filePath);
+       await fs.promises.unlink(this.filePath);
         // Optionally, re-enqueue the item if you want to retry later
         this.queue.unshift({ funcString, args });
         await this.saveQueueToFile();
@@ -222,11 +222,11 @@ const messageHandler = async (Neko, m) => {
               return;
             }
 
-            if (cmd?.isAdmin && !M?.isAdmin) {
+            if (cmd?.isAdmin && !M?.isAdmin && !M.isMod) {
               await Neko.sendTextMessage(
                 M.from,
                 "You Must Be an Admin To use This Command",
-                M,
+                M, 
               );
               return;
             }
@@ -288,6 +288,9 @@ const messageHandler = async (Neko, m) => {
         if (operation.retry(error)) {
           Neko.log("error", `Attempt ${currentAttempt} failed. Retrying...`);
           if (currentAttempt === 3) {
+            await Neko.sendTextMessage(
+              m.from,
+              "*Failed to process the message...*",m)
             Neko.log("error", `Maximum Retry Attempts Reached`);
             return;
           }

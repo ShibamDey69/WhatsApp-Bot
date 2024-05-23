@@ -16,6 +16,7 @@ class YT {
     
 
     download = async (quality = 'low') => {
+        try {
         if (this.type === 'audio' || quality === 'low') {
             let filename = `${tmpdir()}/${Math.random().toString(36)}.${this.type === 'audio' ? 'mp3' : 'mp4'}`;
             const stream = createWriteStream(filename);
@@ -53,6 +54,10 @@ class YT {
         const buffer = await readFile(filename);
         await Promise.all([unlink(videoFilename), unlink(audioFilename), unlink(filename)]);
         return buffer;
+        } catch (error) {
+            console.log(error);
+            throw new Error(error);
+        }
     }
 }
 

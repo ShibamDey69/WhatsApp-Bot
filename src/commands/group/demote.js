@@ -1,5 +1,3 @@
-import { exec } from "child_process";
-
 export default {
   name: "demote",
   aliases: ["dt"],
@@ -30,7 +28,6 @@ export default {
       }
      await Neko.groupParticipantsUpdate(M?.from, [user], "demote");
       await Neko.sendMentionMessage(M.from, `User @${user.split("@")[0]} has been demoted to member`,[user],M)
-      exec(`pm2 restart all`)
     } catch (error) {
       throw new Error(error);
     }

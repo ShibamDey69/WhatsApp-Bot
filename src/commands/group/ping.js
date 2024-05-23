@@ -13,7 +13,7 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      const participants = M.participants.map((v) => v.id).filter((v) => v !== M.sender);
+      const participants = M.groupMeta.participants.map((v) => v.id).filter((v) => v !== M.sender);
       const args = M.args || M.quoted.text;
       const hidden = args?.includes("--hidden") || args?.includes("-h");
       const argument = hidden? args?.replace("--hidden", "")?.replace("-h", "") : args;

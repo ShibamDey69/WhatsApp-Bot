@@ -21,7 +21,10 @@ class UserDbFunc {
           username: name || "No Name Found",
           isPro:false,
           isBanned: false,
-          isMod: false
+          isMod: false,
+          isMarried: false,
+          partner: null,
+          proposal:[]
         }));
       return newUser;
       }
@@ -79,7 +82,7 @@ class UserDbFunc {
   async setMod(Sender, state = true) {
     try {
       if (!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@g.us", "");
+      let sender = Sender.replace("@s.whatsapp.net", "");
       let mod = await this.User.get(sender);
       if (!mod) {
         throw new Error("User not found");
@@ -92,8 +95,60 @@ class UserDbFunc {
       throw new Error(error);
     }
   }
-}
 
+  async setMarried(Sender,partner, state = true,) {
+    try {
+      if (!Sender.endsWith("@g.us")) {
+      let sender = Sender.replace("@s.whatsapp.net", "");
+      let married = await this.User.get(sender);
+      if (!married) {
+        throw new Error("User not found");
+      }
+      married.isMarried = state;
+      married.partner = partner;
+      married.proposal = [];
+      await this.User.set(sender, married);
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async addProposal(Sender, partner) {
+    try {
+      if (!Sender.endsWith("@g.us")) {
+      let sender = Sender.replace("@s.whatsapp.net", "");
+      let proposal = await this.User.get(sender);
+      if (!proposal) {
+        throw new Error("User not found");
+      }
+      proposal.proposal.push(partner);
+      await this.User.set(sender, proposal);
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async rejectProposal(Sender, partner) {
+    try {
+      if (!Sender.endsWith("@g.us")) {
+      let sender = Sender.replace("@s.whatsapp.net", "");
+      let proposal = await this.User.get(sender);
+      if (!proposal) {
+        throw new Error("User not found");
+      }
+      proposal.proposal = proposal.proposal.filter((p) => p !== partner);
+      await this.User.set(sender, proposal);
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+}
 
 class GroupDbFunc {
   constructor() {
