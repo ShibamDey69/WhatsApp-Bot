@@ -123,8 +123,8 @@ const messageHandler = async (Neko, m) => {
           "";
         let isCmd = text?.toString().startsWith(Neko.prefix);
         let from = m.key.remoteJid;
+        let gc = await gc_db.getGroup(from);
         if (from?.endsWith("@g.us")) {
-          let gc = await gc_db.getGroup(from);
           if (gc.isBanned) {
             if (isCmd) {
               let M = await sequilizer(Neko, m);
@@ -168,6 +168,10 @@ const messageHandler = async (Neko, m) => {
 
         if (isCmd) {
           let M = await sequilizer(Neko, m);
+          if(gc.mode === "private" && !M.isMod) return;
+          if(gc.mode === "admin" && (!M.isAdmin ||!M.isMod)) return;
+          if(gc.mode === "public")  {
+          
           Neko.user_db = user_db;
           if (M.quoted.sender || M.mention[0]) {
             await user_db.getUser(M.isQuoted ? M.quoted.sender : M.mention[0] || M.from);
@@ -275,6 +279,7 @@ const messageHandler = async (Neko, m) => {
             return;
           }
         }
+      }
           } catch (error) {
         if (error.data === 429) {
           let retryAfter = error.data?.headers?.["retry-after"] * 1000 || 30000;

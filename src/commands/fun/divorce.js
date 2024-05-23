@@ -33,7 +33,7 @@ export default {
       let receiver = await Neko.user_db.getUser(user.split("@")[0]);
 
       if (action === "accept") {
-        if (!receiver.proposal.includes(M.sender)) {
+        if (!receiver.proposal?.includes(M.sender)) {
           return Neko.sendTextMessage(
             M.from,
             "No divorce request found from this user.",
@@ -60,7 +60,7 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!receiver.proposal.includes(M.sender)) {
+        if (!receiver.proposal?.includes(M.sender)) {
           return Neko.sendTextMessage(
             M.from,
             "No divorce request found from this user.",

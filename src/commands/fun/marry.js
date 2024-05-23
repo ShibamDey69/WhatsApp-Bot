@@ -34,7 +34,7 @@ export default {
 
       // Handling marriage requests
       if (action === "accept") {
-        if (!receiver.proposal.includes(M.sender)) {
+        if (!receiver?.proposal?.includes(M.sender)) {
           return Neko.sendTextMessage(
             M.from,
             "No marriage request found from this user.",
@@ -69,7 +69,7 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!receiver.proposal.includes(M.sender)) {
+        if (!receiver.proposal?.includes(M.sender)) {
           return Neko.sendTextMessage(
             M.from,
             "No marriage request found from this user.",
@@ -87,7 +87,6 @@ export default {
         );
       } else {
         if (sender.isMarried) {
-          console.log(sender);
           return Neko.sendMentionMessage(
             M.from,
             `You are already married to *@${sender.partner.split("@")[0]}*... don't be a cheater 😕 baka..!`,

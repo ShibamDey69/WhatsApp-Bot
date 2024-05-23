@@ -164,6 +164,7 @@ class GroupDbFunc {
         _uid: uuidv4(),
         group_id: groupId,
         name: groupName || "No Name Found",
+        mode: "private",
         isBanned: false,
         isAntilink:false,
         isWelcome:false,
@@ -266,6 +267,22 @@ class GroupDbFunc {
       }
       nsfw.isNsfw = state;
       await this.Group.set(GroupId, nsfw);
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async setGcMode(groupId, mode = "private") {
+    try {
+      if(groupId.endsWith("@g.us")) {
+      let GroupId = groupId.replace("@g.us","");
+      let modeGc = await this.Group.get(GroupId);
+      if (!modeGc) {
+        throw new Error("Group not found");
+      }
+      modeGc.mode = mode;
+      await this.Group.set(GroupId, modeGc);
       }
     } catch (error) {
       throw new Error(error);
