@@ -167,8 +167,8 @@ const messageHandler = async (Neko, m) => {
 
         if (isCmd) {
           let M = await sequilizer(Neko, m);
-          if(gc.mode === "private" && !M.isMod) return;
-          if(gc.mode === "admin" && (!M.isAdmin ||!M.isMod)) return;
+          if(gc?.mode === "private" && !M.isMod) return;
+          if(gc?.mode === "admin" && (!M.isAdmin ||!M.isMod)) return;
           
           Neko.user_db = user_db;
           if (M.quoted.sender || M.mention[0]) {
