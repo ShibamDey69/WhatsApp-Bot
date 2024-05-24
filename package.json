@@ -18,6 +18,7 @@
     "events": "^3.3.0",
     "figlet": "^1.7.0",
     "file-type": "^19.0.0",
+    "got": "^14.3.0",
     "instagram-url-direct": "^1.0.16",
     "mongoose": "^8.4.0",
     "node-cron": "^3.0.3",
@@ -25,6 +26,7 @@
     "quick.db": "^9.1.7",
     "retry": "^0.13.1",
     "uuid": "^9.0.1",
+    "wa-sticker-formatter": "^4.4.4",
     "youtubedl-core": "^4.11.7",
     "yt-search": "^2.11.0",
     "ytdl-core": "^4.11.5"
