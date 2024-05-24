@@ -9,7 +9,7 @@ import mongoose from "mongoose";
     let mongo = await mongoose.connect(process.env.MONGODB);
     if (mongo) {
       const Neko = new NekoEmit({
-        session: "lily",
+        session: "lol",
         printQRInTerminal: false,
       });
 

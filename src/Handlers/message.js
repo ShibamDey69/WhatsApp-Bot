@@ -23,7 +23,6 @@ class Queue {
         await this.saveQueueToFile();
       }
     } catch (error) {
-      console.error("Initialization error:", error);
       await fs.promises.writeFile(this.filePath, "[]");
       await this.initialize();
     }

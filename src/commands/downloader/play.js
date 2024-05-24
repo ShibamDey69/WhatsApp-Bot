@@ -1,4 +1,3 @@
-import All from "@fongsidev/scraper";
 import yts from "yt-search";
 import YT from "../../utils/YT.js";
 
@@ -38,21 +37,13 @@ export default {
         );
       }
       
-      const videos = data.all.filter((v) => v.seconds < 460);
-      const topFive = arr => [...arr].sort((a, b) => b.views - a.views).slice(0, 5)
-      
-      let {url} = topFive(videos)[(~~(Math.random() * 5))];
+      const videos = data.all;
+      let {url} = videos[Math.floor(Math.random() * 1)];
       
       if (M.args.includes("--video") || M.args.includes("-v")) {
-        const ytData = await All.YouTube.down(url);
-      if (!ytData.data.videoUrl) {
-        return await Neko.sendTextMessage(
-          M.from,
-          "Failed to download the song.",
-          M,
-        );
-      }
-        return await Neko.sendVideoMessage(M.from, ytData.data.videoUrl, M);
+        let yt = new YT(url, "video");
+        let res = await yt.download("high");
+        return await Neko.sendVideoMessage(M.from, res, M);
       } else {
         let yt = new YT(url, "audio");
         let res = await yt.download();

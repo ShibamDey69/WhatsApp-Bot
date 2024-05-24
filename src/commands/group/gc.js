@@ -7,7 +7,7 @@ export default {
   category: "group",
   description: "Manage group chats",
   usage:
-    "gc --leave | gc --info | gc --setpp | gc --setname | gc --setdesc | gc --open | gc --close | gc --setdesc <description> | gc --setname <name> | gc --change-settings <setting> | gc --get-invite-code | gc --revoke-invite-code | gc --join-group <inviteCode> | gc --removepp <jid>",
+    "gc --leave | gc --info | gc --setpp | gc --setname | gc --setdesc | gc --open | gc --close | gc --setdesc <description> | gc --setname <name> | gc --change-settings <setting> | gc --invite-code | gc --revoke-invite-code | gc --join-group <inviteCode> | gc --removepp <jid>",
   cooldown: 5,
   isAdmin: true,
   isBotAdmin: true,
@@ -30,7 +30,7 @@ export default {
           "*--setdesc*: Change the description of the group",
           "*--open-settings*: Open group settings for everyone",
           "*--close-settings*: Close group settings for everyone",
-          "*--get-invite-code*: Get the invite code for the group",
+          "*--invite-code*: Get the invite code for the group",
           "*--revoke-invite-code*: Revoke the invite code for the group",
           "*--join-group <inviteCode>*: Join a group using the invite code",
           "*--removepp <jid>*: Remove profile picture of the group",
@@ -49,7 +49,7 @@ export default {
           break;
         case "--info":
           const metadata = await Neko.groupMetadata(M.from);
-          const infoMessage = `*title:* ${metadata.subject},\n*description:* ${metadata.desc}`;
+          const infoMessage = `*Title:* ${metadata.subject}\n*Admins:* ${M.admins}\n*Description:* ${metadata.desc}`;
           Neko.sendTextMessage(M.from, infoMessage, M);
           break;
         case "--setpp":

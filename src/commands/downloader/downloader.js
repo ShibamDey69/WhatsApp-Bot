@@ -1,6 +1,5 @@
 import { fileTypeFromBuffer } from "file-type";
 import insta from "instagram-url-direct";
-import All from "@fongsidev/scraper";
 import axios from "axios";
 import YT from "../../utils/YT.js";
 export default {
@@ -93,15 +92,9 @@ export default {
           let res = await yt.download();
           return await Neko.sendAudioMessage(M.from, res, M);
         } else {
-          let { data } = await All.YouTube.down(args);
-          if (!data) {
-            return await Neko.sendTextMessage(
-              M.from,
-              "Failed to download media from the provided URL.",
-              M,
-            );
-          }
-          return await Neko.sendVideoMessage(M.from, data.videoUrl, M);
+          let yt = new YT(args, "video");
+          let res = await yt.download("high");
+          return await Neko.sendVideoMessage(M.from, res, M);
         }
       } else {
         return await Neko.sendTextMessage(M.from, "*Inavlid Url Provided!*", M);

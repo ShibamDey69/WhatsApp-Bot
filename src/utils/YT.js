@@ -13,8 +13,6 @@ class YT {
         this.type = type;
     }
 
-    
-
     download = async (quality = 'low') => {
         try {
         if (this.type === 'audio' || quality === 'low') {

@@ -12,7 +12,6 @@
   },
   "type": "module",
   "dependencies": {
-    "@fongsidev/scraper": "^1.0.13",
     "@whiskeysockets/baileys": "6.7.2",
     "better-sqlite3": "^10.0.0",
     "cli-color": "^2.0.4",

@@ -238,7 +238,7 @@ class NekoEmit extends EventEmitter {
     const dataType = await fileTypeFromBuffer(stream);
     return {
       data: stream,
-      mime: dataType,
+      mime: dataType.mime,
     };
   };
 
