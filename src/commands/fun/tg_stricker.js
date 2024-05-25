@@ -1,4 +1,5 @@
 import axios from "axios";
+  import { Sticker, StickerTypes } from "wa-sticker-formatter"; // ES6
 
 class TelegramScraper {
   constructor(opt) {
@@ -71,10 +72,32 @@ export default {
           M.from,
         "stickers will be send in dm...",M)
       }
+      let regex = /^https:\/\/t\.me\/addstickers\/[a-zA-Z0-9_]+$/;
+      if (!regex.test(M.args)) {
+        return await Neko.sendTextMessage(
+          M.from,
+          "Please provide a sticker link.",
+          M,
+        );
+      }
       const sticker = await tele.sticker(text);
       for (let i = 0; i < sticker.stickers.length; i++) {
-        if(sticker.stickers[i].endsWith(".webp")){
-          await Neko.sendStrickerMessage(M.sender, {url:sticker.stickers[i]}, M);
+        if(sticker.stickers[i].endsWith(".webp") || sticker.stickers[i].endsWith(".webm")){
+      let res = await axios.get(sticker.stickers[i], {
+        responseType: "arraybuffer",
+      });
+      let buffer = Buffer.from(res.data, "utf-8");
+      let sticker_data = new Sticker(buffer,{
+        pack: "Shibam",
+        author: "Neko-MD",
+        type: StickerTypes.FULL,
+        categories: ["🤩", "🎉"],
+        id: "12345",
+        quality: 15,
+        background: "transparent",
+      });
+          
+          await Neko.sendStrickerMessage(M.sender, await sticker_data.build(), M);
         }
       }
     } catch (error) {

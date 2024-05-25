@@ -24,6 +24,7 @@ const cooldown = async (userId, duration, func, Neko, M) => {
       }, duration);
     }
   } catch (error) {
+    console.log(error);
     throw Error(error);
   }
 };
