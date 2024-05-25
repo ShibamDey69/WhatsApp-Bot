@@ -26,8 +26,8 @@ const sequilizer = async (Neko, m) => {
          m.message?.conversation ||
          m.message?.[m.messageType]?.text ||
          m.message?.[m.messageType]?.caption ||
+         m.message?.[m.messageType]?.contextInfo?.quotedMessage ||
          m.messageType ||
-         m.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
          "";
       m.prefix = META_DATA.prefix;
       m.from = m.key?.remoteJid;

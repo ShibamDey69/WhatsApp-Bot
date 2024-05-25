@@ -53,7 +53,7 @@ const tele = new TelegramScraper({
 });
 export default {
   name: "tg_sticker",
-  alias: ["tgsticker", "tgsticker", "tgsticker"],
+  alias: ["ts", "tgsticker", "tgsticker"],
   desc: "Converts a text to sticker",
   category: "fun",
   usage: `tg_sticker <text>`,

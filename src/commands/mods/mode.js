@@ -1,8 +1,8 @@
 export default {
   name: "mode",
-  aliases: ["mode"],
+  alias: ["mode"],
   description: "Set or unset a user's mod status",
-  category: "owner",
+  category: "mods",
   usage: "mode ?=<mode> --true/false",
   cooldown: 5,
   isAdmin: false,
@@ -14,14 +14,14 @@ export default {
   run: async (Neko, M) => {
     try {
       let args = M.args;
-      if (!args.includes("?=")) {
+      if (!args.includes("--")) {
         return await Neko.sendTextMessage(
           M.from,
-          `Please provide the mode as --true or --false. like this ${M.prefix}mode ?=<private> --true/false`,
+          `Please use --public or --admin or --private. like this ${M.prefix}mode --private`,
           M,
         );
       }
-      let mode = args?.split("?=")[1]?.trim()?.toLowerCase();
+      let mode = args?.split("--")[1]?.trim()?.toLowerCase();
 
       switch (mode) {
         case "private":
@@ -51,7 +51,7 @@ export default {
         default:
           await Neko.sendTextMessage(
             M.from,
-            `Invalid mode. Please use ?=public or ?=admin or ?=private. like this ${M.prefix}mode ?=<private> `,
+            `Invalid mode. Please use --public or --admin or --private. like this ${M.prefix}mode --private`,
             M,
           );
           break;

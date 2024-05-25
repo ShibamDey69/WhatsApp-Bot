@@ -1,5 +1,6 @@
 import fs from "fs";
 import retry from "retry";
+import { getContentType } from "@whiskeysockets/baileys";
 import sequilizer from "../utils/sequelized.js";
 import cooldown from "../utils/cooldown.js";
 import DB from "../connect/db.js";
@@ -65,8 +66,9 @@ class Queue {
           "cooldown",
           "gc_db",
           "user_db",
+          "getContentType",
           `return ${funcString}`,
-        )(retry, sequilizer, cooldown, gc_db, user_db); // Convert string back to function with context
+        )(retry, sequilizer, cooldown, gc_db, user_db,getContentType); // Convert string back to function with context
         await this.processItem(func, ...args);
         await this.saveQueueToFile(); // Save queue data after processing each item
       } catch (error) {
@@ -103,6 +105,7 @@ const messageHandler = async (Neko, m) => {
     cooldown,
     gc_db,
     user_db,
+    getContentType,
   ) => {
     const operation = retry.operation({
       retries: 3, 
@@ -113,12 +116,12 @@ const messageHandler = async (Neko, m) => {
 
     operation.attempt(async (currentAttempt) => {
       try {
+        let messageType = getContentType(m.message);
         let text =
           m.message?.conversation ||
-          m.message?.[m.messageType]?.text ||
-          m.message?.[m.messageType]?.caption ||
+          m.message?.[messageType]?.text ||
+          m.message?.[messageType]?.caption ||
           m.messageType ||
-          m.message?.extendedTextMessage?.text ||
           "";
         let isCmd = text?.toString().startsWith(Neko.prefix);
         let from = m.key.remoteJid;
@@ -304,6 +307,7 @@ const messageHandler = async (Neko, m) => {
     cooldown,
     gc_db,
     user_db,
+    getContentType
   );
 };
 

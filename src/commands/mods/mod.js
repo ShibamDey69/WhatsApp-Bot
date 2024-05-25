@@ -1,8 +1,8 @@
 export default {
   name: "mod",
-  aliases: ["mod"],
+  alias: ["mod"],
   description: "Set or unset a user's mod status",
-  category: "owner",
+  category: "mods",
   usage: "mod @tag/mention --true/false",
   cooldown: 5,
   isAdmin: false,

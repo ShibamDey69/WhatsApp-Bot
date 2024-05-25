@@ -1,6 +1,7 @@
 export default {
   name: "test",
   description: "Test Command",
+  category: "test",
   isOwner:false,
   run: async (Neko, M) => {
     try {

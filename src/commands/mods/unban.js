@@ -2,7 +2,7 @@ export default {
   name: "unban",
   aliases: ["unban"],
   description: "Unban a user or group from using the bot",
-  category: "group",
+  category: "mods",
   usage: "unban @tag",
   cooldown: 5,
   isAdmin: false,

@@ -2,7 +2,7 @@ export default {
   name: "ban",
   aliases: ["ban"],
   description: "Ban a user or group from using the bot",
-  category: "group",
+  category: "mods",
   usage: "ban @tag",
   cooldown: 5,
   isAdmin: false,
