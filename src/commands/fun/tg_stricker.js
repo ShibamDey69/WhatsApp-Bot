@@ -1,5 +1,5 @@
 import axios from "axios";
-  import { Sticker, StickerTypes } from "wa-sticker-formatter"; // ES6
+import { Sticker, StickerTypes } from "wa-sticker-formatter"; // ES6
 
 class TelegramScraper {
   constructor(opt) {
@@ -9,15 +9,21 @@ class TelegramScraper {
 
   async sticker(sticker_pack) {
     try {
-      let res = await axios.post(`https://api.telegram.org/bot${this.token}/getStickerSet`, {
-        name: sticker_pack,
-      });
+      let res = await axios.post(
+        `https://api.telegram.org/bot${this.token}/getStickerSet`,
+        {
+          name: sticker_pack,
+        },
+      );
 
       const stickers = res.data.result;
       const linkPromises = stickers?.stickers.map(async (item) => {
-        const pathResponse = await axios.post(`https://api.telegram.org/bot${this.token}/getFile`, {
-          file_id: item.file_id,
-        });
+        const pathResponse = await axios.post(
+          `https://api.telegram.org/bot${this.token}/getFile`,
+          {
+            file_id: item.file_id,
+          },
+        );
         return pathResponse.data.result;
       });
 
@@ -32,7 +38,8 @@ class TelegramScraper {
         is_animated: stickers.is_animated,
         is_video: stickers.is_video,
         stickers: links.map(
-          (item) => `https://api.telegram.org/file/bot${this.token}/${item.file_path}`
+          (item) =>
+            `https://api.telegram.org/file/bot${this.token}/${item.file_path}`,
         ),
       };
     } catch (error) {
@@ -66,11 +73,11 @@ export default {
           M,
         );
       }
-      const text = M.args.replaceAll("https://t.me/addstickers/","").replaceAll("t.me/addstickers/","");
+      const text = M.args
+        .replaceAll("https://t.me/addstickers/", "")
+        .replaceAll("t.me/addstickers/", "");
       if (M.isGroup) {
-        await Neko.sendTextMessage(
-          M.from,
-        "stickers will be send in dm...",M)
+        await Neko.sendTextMessage(M.from, "stickers will be send in dm...", M);
       }
       let regex = /^https:\/\/t\.me\/addstickers\/[a-zA-Z0-9_]+$/;
       if (!regex.test(M.args)) {
@@ -82,27 +89,28 @@ export default {
       }
       const sticker = await tele.sticker(text);
       for (let i = 0; i < sticker.stickers.length; i++) {
-        if(sticker.stickers[i].endsWith(".webp") || sticker.stickers[i].endsWith(".webm")){
-      let res = await axios.get(sticker.stickers[i], {
-        responseType: "arraybuffer",
-      });
-      let buffer = Buffer.from(res.data, "utf-8");
-      let sticker_data = new Sticker(buffer,{
-        pack: "Shibam",
-        author: "Neko-MD",
-        type: StickerTypes.FULL,
-        categories: ["🤩", "🎉"],
-        id: "12345",
-        quality: 15,
-        background: "transparent",
-      });
-          
-          await Neko.sendStrickerMessage(M.sender, await sticker_data.build(), M);
+        if(sticker.stickers[i].endsWith(".tgs")) {
+          return await Neko.sendTextMessage(M.from, "Sticker format is not available in WhatsApp.", M)
         }
+        let res = await axios.get(sticker.stickers[i], {
+          responseType: "arraybuffer",
+        });
+        let buffer = Buffer.from(res.data, "utf-8");
+        let sticker_data = new Sticker(buffer, {
+          pack: "Shibam",
+          author: "Neko-MD",
+          type: StickerTypes.FULL,
+          categories: ["🤩", "🎉"],
+          id: "12345",
+          quality: 15,
+          background: "transparent",
+        });
+
+        await Neko.sendStrickerMessage(M.sender, await sticker_data.build(), M);
       }
     } catch (error) {
       console.log(error);
       throw new Error(error);
     }
   },
-}
+};
