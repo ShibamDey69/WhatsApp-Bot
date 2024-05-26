@@ -172,15 +172,15 @@ const messageHandler = async (Neko, m) => {
 
         if (isCmd) {
           let M = await sequilizer(Neko, m);
-          if (gc?.mode === "private" && !M.isMod && isGroup) return;
-          if (gc?.mode === "admin" && (!M.isAdmin || !M.isMod) && isGroup)
+          if (gc?.mode === "private" && !M?.isMod && isGroup) return;
+          if (gc?.mode === "admin" && (!M?.isAdmin || !M?.isMod) && isGroup)
             return;
 
           Neko.user_db = user_db;
           Neko.gc_db = gc_db;
-          if (M.quoted.sender || M.mention[0]) {
+          if (M?.quoted.sender || M.mention[0]) {
             await user_db.getUser(
-              M.isQuoted ? M.quoted.sender : M.mention[0],
+              M?.isQuoted ? M?.quoted?.sender : M.mention[0],
               M.pushName,
             );
           }
@@ -204,7 +204,7 @@ const messageHandler = async (Neko, m) => {
             return;
           }
           await Neko.sendReactMessage(M.from, "♥️", M);
-          if (Neko?.commands?.has(M.cmdName)) {
+          if (Neko?.commands?.has(M?.cmdName)) {
             let cmd = Neko?.commands.get(M?.cmdName);
             if (!M?.isGroup && (!M?.isMod || !M?.isPro)) {
               await Neko.sendReactMessage(M?.from, "❌", M);
