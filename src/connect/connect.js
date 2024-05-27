@@ -106,6 +106,7 @@ class NekoEmit extends EventEmitter {
         this[key] = Neko[key];
       }
     }
+    this.prefix = META_DATA.prefix;
     this.commands = await loadCommands();
   }
 

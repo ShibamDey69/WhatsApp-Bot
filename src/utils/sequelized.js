@@ -1,96 +1,108 @@
 import { getContentType } from "@whiskeysockets/baileys";
 import fs from "fs";
 import DB from "../connect/db.js";
-let META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
-let user_db = new DB.UserDbFunc();
-let group_db = new DB.GroupDbFunc();
+
+const META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
+const user_db = new DB.UserDbFunc();
+const group_db = new DB.GroupDbFunc();
+
+const fetchUserData = async (filter) => {
+    const users = await user_db.filterUser(filter, true);
+    return users.map(user => user.value.user_id);
+};
+
+const fetchGroupData = async (filter) => {
+    const groups = await group_db.filterGroup(filter, true);
+    return groups.map(group => group.value.group_id);
+};
+
+const getMessageText = (message, messageType) => {
+    return message?.conversation ||
+           message?.[messageType]?.text ||
+           message?.[messageType]?.caption ||
+           message?.[messageType]?.contextInfo?.quotedMessage ||
+           messageType ||
+           "";
+};
 
 const sequilizer = async (Neko, m) => {
-   try {
-      let modUser = await user_db.filterUser("isMod", true);
-      let mods = modUser.map((user) => user.value.user_id);
-      let proUser = await user_db.filterUser("isPro", true);
-      let pros = proUser.map((user) => user.value.user_id);
-      let banUser = await user_db.filterUser("isBanned", true);
-      let bans = banUser.map((user) => user.value.user_id);
-      let gcBan = await group_db.filterGroup("isBanned", true);
-      let GcBan = gcBan.map((user) => user.value.group_id);
-      let antilink = await group_db.filterGroup("isAntilink", true);
-      let Antilink = antilink.map((group) => group.value.group_id);
-      let welcome = await group_db.filterGroup("isWelcome", true);
-      let Welcome = welcome.map((group) => group.value.group_id);
-      let reassign = await group_db.filterGroup("isReassign", true);
-      let Reassign = reassign.map((group) => group.value.group_id);
-      m.messageType = getContentType(m.message);
-      m.text =
-         m.message?.conversation ||
-         m.message?.[m.messageType]?.text ||
-         m.message?.[m.messageType]?.caption ||
-         m.message?.[m.messageType]?.contextInfo?.quotedMessage ||
-         m.messageType ||
-         "";
-      m.prefix = META_DATA.prefix;
-      m.from = m.key?.remoteJid;
-      m.isGroup = m.from?.endsWith("@g.us");
-      m.isMe = m.key?.fromMe;
-      m.owner = META_DATA.ownerNumber;
-      m.sender = m?.isMe
-         ? `${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`
-         : m.isGroup
-           ? m.key?.participant
-           : m.from;
-      m.groupMeta = m.isGroup ? await Neko?.groupMetadata(m.from) : "";
-      m.groupOwner = m.groupMeta?.owner;
-      m.admins = m.isGroup
-         ? m.groupMeta.participants
-              .filter((v) => v.admin === "admin" || v.admin === "superadmin")
-              .map((v) => v.id)
-         : [];
-      m.isAdmin = m.isGroup ? m.admins.includes(m.sender) : false;
-      m.isOwner = m.owner?.includes(m.sender?.split("@")[0]);
-      m.cmdName = m.text
-         ?.toString()
-         .slice(m.prefix.length)
-         .trim()
-         .split(" ")
-         .shift()
-         .toLowerCase();
-      m.args = m.text?.slice(2 + m.cmdName.length).trim();
-      m.mods = [...m.owner.map((v) => `${v}@s.whatsapp.net`), ...mods];
-      m.pro = [...m.mods, ...pros];
-      m.reassign = Reassign;
-      m.ban = bans;
-      m.gcBan = GcBan;
-      m.antilink = Antilink;
-      m.welcome = Welcome;
-      m.isWelcome = m.welcome.includes(m.from);
-      m.isAntilink = m.antilink.includes(m.from);
-      m.isGcBanned = m.gcBan.includes(m.from);
-      m.isBanned = m.ban.includes(m.sender);
-      m.isPro = m.pro.includes(m.sender);
-      m.isReassign = m.reassign.includes(m.from);
-      m.isCmd = m.text?.toString().startsWith(m.prefix);
-      m.isBotMsg =
-         (m.key?.id.startsWith("BAE5") && m.key?.id?.length === 16) ||
-         (m.key?.id.startsWith("3EB0") && m.key?.id?.length === 12);
-      m.isBotAdmin = m.isGroup
-         ? m.admins?.includes(`${Neko.user.id.split(":")[0]}@s.whatsapp.net`)
-         : false;
-      m.isMod = m.mods?.includes(m.sender);
-      m.mention = m.message?.[m.messageType]?.contextInfo?.mentionedJid || [];
-      m.quoted = {
-         message: m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
-         sender: m.message?.extendedTextMessage?.contextInfo?.participant,
-         text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage
-            ?.conversation,
-      };
-      m.isMentioned = m.mention.length !== 0;
-      m.isQuoted = m.quoted?.message ? true : false;
-      return m;
-   } catch (error) {
-      console.log(error);
-      Neko.log("error", error);
-   }
+    try {
+        const [mods, pros, bans, GcBan, Antilink, Welcome, Reassign] = await Promise.all([
+            fetchUserData("isMod"),
+            fetchUserData("isPro"),
+            fetchUserData("isBanned"),
+            fetchGroupData("isBanned"),
+            fetchGroupData("isAntilink"),
+            fetchGroupData("isWelcome"),
+            fetchGroupData("isReassign")
+        ]);
+
+        const messageType = getContentType(m.message);
+        const text = getMessageText(m.message, messageType);
+        const from = m.key?.remoteJid;
+        const isGroup = from?.endsWith("@g.us");
+        const sender = isGroup ? m.key?.participant : from;
+
+        let groupMeta, admins;
+        if (isGroup) {
+            groupMeta = await Neko.groupMetadata(from);
+            admins = groupMeta.participants.filter(v => v.admin).map(v => v.id);
+        } else {
+            groupMeta = null;
+            admins = [];
+        }
+
+        const ownerNumber = META_DATA.ownerNumber;
+        const modsList = [...ownerNumber.map(v => `${v}@s.whatsapp.net`), ...mods];
+
+        const mUpdated = {
+            ...m,
+            messageType,
+            text,
+            prefix: META_DATA.prefix,
+            from,
+            isGroup,
+            sender,
+            groupMeta,
+            groupOwner: groupMeta?.owner,
+            admins,
+            isAdmin: isGroup ? admins.includes(sender) : false,
+            isOwner: ownerNumber.includes(sender?.split("@")[0]),
+            cmdName: text?.slice(META_DATA.prefix.length).trim().split(" ").shift().toLowerCase(),
+            args: text?.slice(META_DATA.prefix.length + text.split(" ")[0].length).trim(),
+            mods: modsList,
+            pro: [...modsList, ...pros],
+            reassign: Reassign,
+            ban: bans,
+            gcBan: GcBan,
+            antilink: Antilink,
+            welcome: Welcome,
+            isWelcome: Welcome.includes(from),
+            isAntilink: Antilink.includes(from),
+            isGcBanned: GcBan.includes(from),
+            isBanned: bans.includes(sender),
+            isPro: [...modsList, ...pros].includes(sender),
+            isReassign: Reassign.includes(from),
+            isCmd: text?.startsWith(META_DATA.prefix),
+            isBotMsg: ["BAE5", "3EB0"].some(prefix => m.key?.id.startsWith(prefix) && [16, 12].includes(m.key?.id?.length)),
+            isBotAdmin: isGroup ? admins.includes(`${Neko.user.id.split(":")[0]}@s.whatsapp.net`) : false,
+            isMod: mods.includes(sender),
+            mention: m.message?.[messageType]?.contextInfo?.mentionedJid || [],
+            quoted: {
+                message: m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
+                sender: m.message?.extendedTextMessage?.contextInfo?.participant,
+                text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation,
+            },
+            isMentioned: !!m.message?.[messageType]?.contextInfo?.mentionedJid,
+            isQuoted: !!m.message?.extendedTextMessage?.contextInfo?.quotedMessage
+        };
+
+        return mUpdated;
+    } catch (error) {
+        console.error(error);
+        Neko.log("error", error);
+        return m; // Returning the original message object in case of error
+    }
 };
 
 export default sequilizer;
