@@ -192,12 +192,11 @@ const messageHandler = async (Neko, m) => {
               try {
                 const api = `https://www.nyckel.com/v1/functions/mcpf3t3w6o3ww7id/invoke`;
                 const formData = new FormData();
-                // Append the file data directly to the form data
                 file.ext = file.ext.includes("mp4") ? "gif" : file.ext;
                 file.mime = file.mime.includes("mp4") ? "image/gif" : file.mime;
                 formData.append("file", file.data, {
                   filename: `file.${file.ext}`,
-                  contentType: file.mime, // You may need to pass the correct MIME type if available
+                  contentType: file.mime,
                 });
                 // Make the API request
                 let res = await axios.post(api, formData, {
@@ -208,7 +207,7 @@ const messageHandler = async (Neko, m) => {
                 // Return the response data
                 return res.data;
               } catch (err) {
-                return null; // or some other appropriate error handling
+                return null; //
               }
             };
 
@@ -221,16 +220,18 @@ const messageHandler = async (Neko, m) => {
               let res = await NsfwDetector(data);
 
               if (res?.labelName === "NSFW Porn") {
-                let M = await sequilizer(Neko, m);
-                await Neko.sendMessage(M.from, { delete: M.key });
-                await Neko.groupParticipantsUpdate(from, [M.sender], "remove");
-              } else if (res?.labelName === "SFW Mildly Suggestive") {
-                let M = await sequilizer(Neko, m);
-                await Neko.sendMessage(M.from, { delete: M.key });
+                await Neko.sendMessage(from, { delete: m.key });
                 return await Neko.sendTextMessage(
-                  M.from,
+                  from,
                   "*_This is a warning! if you send nsfw again u can get kicked from this group_*",
-                  M,
+                  m,
+                );
+              } else if (res?.labelName === "SFW Mildly Suggestive") {
+                await Neko.sendMessage(from, { delete: m.key });
+                return await Neko.sendTextMessage(
+                  from,
+                  "*_This is a warning! if you send nsfw again u can get kicked from this group_*",
+                  m,
                 );
               }
             }
