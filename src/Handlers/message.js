@@ -2,6 +2,8 @@ import fs from "fs";
 import retry from "retry";
 import { getContentType } from "@whiskeysockets/baileys";
 import sequilizer from "../utils/sequelized.js";
+import FormData from "form-data";
+import axios from "axios";
 import cooldown from "../utils/cooldown.js";
 import DB from "../connect/db.js";
 let META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
@@ -68,8 +70,21 @@ class Queue {
           "gc_db",
           "user_db",
           "getContentType",
+          "FormData",
+          "axios",
+          "fs",
           `return ${funcString}`,
-        )(retry, sequilizer, cooldown, gc_db, user_db, getContentType); // Convert string back to function with context
+        )(
+          retry,
+          sequilizer,
+          cooldown,
+          gc_db,
+          user_db,
+          getContentType,
+          FormData,
+          axios,
+          fs,
+        ); // Convert string back to function with context
         await this.processItem(func, ...args);
         await this.saveQueueToFile(); // Save queue data after processing each item
       } catch (error) {
@@ -107,6 +122,9 @@ const messageHandler = async (Neko, m) => {
     gc_db,
     user_db,
     getContentType,
+    FormData,
+    axios,
+    fs,
   ) => {
     const operation = retry.operation({
       retries: 2,
@@ -165,6 +183,55 @@ const messageHandler = async (Neko, m) => {
                 );
                 await Neko.sendMessage(M?.from, { delete: M?.key });
                 return;
+              }
+            }
+          }
+
+          if (gc.isAntiNsfw) {
+            const NsfwDetector = async (file) => {
+              try {
+                const api = `https://www.nyckel.com/v1/functions/mcpf3t3w6o3ww7id/invoke`;
+                const formData = new FormData();
+                // Append the file data directly to the form data
+                file.ext = file.ext.includes("mp4") ? "gif" : file.ext;
+                file.mime = file.mime.includes("mp4") ? "image/gif" : file.mime;
+                formData.append("file", file.data, {
+                  filename: `file.${file.ext}`,
+                  contentType: file.mime, // You may need to pass the correct MIME type if available
+                });
+                // Make the API request
+                let res = await axios.post(api, formData, {
+                  headers: {
+                    ...formData.getHeaders(),
+                  },
+                });
+                // Return the response data
+                return res.data;
+              } catch (err) {
+                return null; // or some other appropriate error handling
+              }
+            };
+
+            if (
+              messageType === "imageMessage" ||
+              messageType === "stickerMessage" ||
+              messageType === "documentMessage"
+            ) {
+              let data = await Neko.downloadMediaContent(Neko, m);
+              let res = await NsfwDetector(data);
+
+              if (res?.labelName === "NSFW Porn") {
+                let M = await sequilizer(Neko, m);
+                await Neko.sendMessage(M.from, { delete: M.key });
+                await Neko.groupParticipantsUpdate(from, [M.sender], "remove");
+              } else if (res?.labelName === "SFW Mildly Suggestive") {
+                let M = await sequilizer(Neko, m);
+                await Neko.sendMessage(M.from, { delete: M.key });
+                return await Neko.sendTextMessage(
+                  M.from,
+                  "*_This is a warning! if you send nsfw again u can get kicked from this group_*",
+                  M,
+                );
               }
             }
           }
@@ -314,6 +381,9 @@ const messageHandler = async (Neko, m) => {
     gc_db,
     user_db,
     getContentType,
+    FormData,
+    axios,
+    fs,
   );
 };
 

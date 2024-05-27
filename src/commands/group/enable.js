@@ -61,6 +61,18 @@ export default {
           await Neko.gc_db.setGcNsfw(M.from, true);
           await Neko.sendTextMessage(M.from, "*NSFW has been enabled.*", M);
           break;
+        case "antinsfw":
+        case "antinsfwgc":
+          if (gc.isAntiNsfw) {
+            return await Neko.sendTextMessage(
+              M.from,
+              "*Anti-NSFW is already enabled.*",
+              M,
+            );
+          }
+          await Neko.gc_db.setGcAntiNsfw(M.from, true);
+          await Neko.sendTextMessage(M.from, "*Anti-NSFW has been enabled.*", M);
+          break;
         default:
           await Neko.sendTextMessage(
             M.from,

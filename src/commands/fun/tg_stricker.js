@@ -66,10 +66,17 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      const text = M.args
-  .replaceAll("https://t.me/addstickers/", "")
-  .replaceAll("t.me/addstickers/", "");
       if (!M.args) {
+        return await Neko.sendTextMessage(
+          M.from,
+          "Please provide a sticker link.",
+          M,
+        );
+      }
+
+      let regex = /^https:\/\/t\.me\/addstickers\/[a-zA-Z0-9_]+$/;
+      
+      if (!regex.test(M.args)) {
         return await Neko.sendTextMessage(
           M.from,
           "Please provide a sticker link.",
@@ -80,28 +87,11 @@ export default {
       if (M.isGroup) {
         await Neko.sendTextMessage(M.from, "stickers will be send in dm...", M);
       }
+
+      const text = M.args
+  .replaceAll("https://t.me/addstickers/", "")
+  .replaceAll("t.me/addstickers/", "");
       
-      let regex = /^https:\/\/t\.me\/addstickers\/[a-zA-Z0-9_]+$/;
-      const isValidUrl = (url) => {
-        let urlPattern = new RegExp(
-          "^(https?:\\/\\/)?" +
-            "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" +
-            "((\\d{1,3}\\.){3}\\d{1,3}))" +
-            "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" +
-            "(\\?[;&a-z\\d%_.~+=-]*)?" +
-            "(\\#[-a-z\\d_]*)?$",
-          "i",
-        );
-        return !!urlPattern.test(url);
-      };
-      
-      if (!regex.test(M.args) && isValidUrl(M.args)) {
-        return await Neko.sendTextMessage(
-          M.from,
-          "Please provide a sticker link.",
-          M,
-        );
-      }
       const sticker = await tele.sticker(text);
       for (let i = 0; i < sticker.stickers.length; i++) {
         if (sticker.stickers[i].endsWith(".tgs")) {

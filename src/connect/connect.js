@@ -239,6 +239,7 @@ class NekoEmit extends EventEmitter {
     return {
       data: stream,
       mime: dataType.mime,
+      ext: dataType.ext,
     };
   };
 

@@ -170,6 +170,7 @@ class GroupDbFunc {
         isWelcome:false,
         isReassign:false,
         isNsfw:false,
+        isAntiNsfw:false,
         created: Date.now()
       }));
       return newGroup;
@@ -283,6 +284,22 @@ class GroupDbFunc {
       }
       modeGc.mode = mode;
       await this.Group.set(GroupId, modeGc);
+      }
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async setGcAntiNsfw(groupId, state = true){
+    try {
+      if(groupId.endsWith("@g.us")) {
+      let GroupId = groupId.replace("@g.us","");
+      let antiNsfw = await this.Group.get(GroupId);
+      if (!antiNsfw) {
+        throw new Error("Group not found");
+      }
+      antiNsfw.isAntiNsfw = state;
+      await this.Group.set(GroupId, antiNsfw);
       }
     } catch (error) {
       throw new Error(error);
