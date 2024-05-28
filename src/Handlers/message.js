@@ -221,6 +221,7 @@ const messageHandler = async (Neko, m) => {
         Neko.user_db = user_db;
         Neko.gc_db = gc_db;
         const M = await sequilizer(Neko, m);
+        console.log(M)
         if (gc?.mode === "private" && !M?.isMod && isGroup) return false;
 
         if (gc?.mode === "admin" && (!M?.isAdmin || !M?.isMod) && isGroup)

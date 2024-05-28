@@ -41,7 +41,7 @@ const sequilizer = async (Neko, m) => {
         const text = getMessageText(m.message, messageType);
         const from = m.key?.remoteJid;
         const isGroup = from?.endsWith("@g.us");
-        const quotedMessageType = m.message?.extendedTextMessage?.contextInfo?.quotedMessage?Object.keys(m.message?.extendedTextMessage?.contextInfo?.quotedMessage)[0]:"";
+        const quotedMessageType = m.message?.extendedTextMessage?.contextInfo?.quotedMessage?Object.keys(m.message?.extendedTextMessage?.contextInfo?.quotedMessage)[0]: null;
         const isMe = m.key?.fromMe;
         const sender = isMe?`${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`:isGroup ? m.key?.participant : from;
         let groupMeta, admins;
@@ -88,7 +88,7 @@ const sequilizer = async (Neko, m) => {
             isMod: modsList.includes(sender),
             mention: m.message?.[messageType]?.contextInfo?.mentionedJid || [],
             quoted: {
-                mtype: m.message?.extendedTextMessage?.contextInfo?.quotedMessage[quotedMessageType]?.mimetype?.split("/")[0] || '',
+                mtype: quotedMessageType?m.message?.extendedTextMessage?.contextInfo?.quotedMessage[quotedMessageType]?.mimetype?.split("/")[0]:null ,
                 message: m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
                 sender: m.message?.extendedTextMessage?.contextInfo?.participant,
                 text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation,
