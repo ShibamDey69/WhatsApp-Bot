@@ -25,6 +25,13 @@ export default {
           M,
         );
       }
+      if(M.quoted.mtype !== "video") {
+        return await Neko.sendTextMessage(
+          M.from,
+          "Please quote the video you want to convert to audio.",
+          M,
+        );
+      }
       const media = await Neko.downloadMediaContent(Neko,M.quoted);
       const audio = await toAudio(media.data);
       await Neko.sendMessage(M.from, { audio: audio, mimetype: "audio/mpeg" }, { quoted: M });
