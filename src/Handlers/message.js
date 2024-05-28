@@ -218,10 +218,10 @@ const messageHandler = async (Neko, m) => {
         sequilizer,
         user_db,
       ) => {
+    try {
         Neko.user_db = user_db;
         Neko.gc_db = gc_db;
         const M = await sequilizer(Neko, m);
-        console.log(M)
         if (gc?.mode === "private" && !M?.isMod && isGroup) return false;
 
         if (gc?.mode === "admin" && (!M?.isAdmin || !M?.isMod) && isGroup)
@@ -328,7 +328,11 @@ const messageHandler = async (Neko, m) => {
           }
           return true;
         }
-      };
+      } catch (error) {
+        console.log(error);
+        return;
+      }
+   };
 
       const handleErrors = async (
         error,
@@ -354,6 +358,7 @@ const messageHandler = async (Neko, m) => {
               "*Failed to process the message...*",
               m,
             );
+            console.log(error);
             Neko.log("error", `Maximum Retry Attempts Reached`);
             return;
           }
@@ -368,7 +373,7 @@ const messageHandler = async (Neko, m) => {
           );
         try {
           const gc = await gc_db.getGroup(from,m?.groupMeta?.subject);
-
+          await user_db.getUser(sender);
           if (
             isGroup &&
             (await handleGroup(
