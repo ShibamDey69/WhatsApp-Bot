@@ -38,7 +38,6 @@ const groupHandler = async (Neko, m) => {
             break;
           case "demote":
           if(gc.isReassign) {
-            console.log(M)
             let demoted = M.participants[0];
             let message2 = Neko.res.response.demotion[
               (~~(Math.random() * Neko.res.response.demotion.length))

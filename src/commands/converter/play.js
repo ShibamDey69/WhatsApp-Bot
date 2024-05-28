@@ -5,7 +5,7 @@ export default {
   name: "play",
   alias: ["p"],
   desc: "Play music from youtube",
-  category: "downloader",
+  category: "converter",
   usage: `play <song name>`,
   cooldown: 5,
   isAdmin: false,

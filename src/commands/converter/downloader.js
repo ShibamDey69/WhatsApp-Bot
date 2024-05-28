@@ -3,10 +3,10 @@ import insta from "instagram-url-direct";
 import axios from "axios";
 import YT from "../../utils/YT.js";
 export default {
-  name: "downloader",
+  name: "download",
   alias: ["dl", "down"],
   desc: "Download media from various sources",
-  category: "downloader",
+  category: "converter",
   usage: `downloader <url>`,
   cooldown: 5,
   isAdmin: false,

@@ -28,12 +28,10 @@ class NekoEmit extends EventEmitter {
     this.logger = logger;
   }
   async connect() {
-
     const SingleAuth = new AuthenticationFromMongo(
       `${this.socketConfig.session}`,
     );
-    const { saveCreds, clearState, state } =
-      await SingleAuth.useMongoAuth();
+    const { saveCreds, clearState, state } = await SingleAuth.useMongoAuth();
 
     const { version, isLatest } = await fetchLatestWaWebVersion({});
     const Neko = makeWASocket({
@@ -73,9 +71,9 @@ class NekoEmit extends EventEmitter {
     });
 
     Neko.ev.on("group-participants.update", async (update) => {
-      this.emit("groups", update)
-    })
-    
+      this.emit("groups", update);
+    });
+
     Neko.ev.on("call", async (calls) => {
       for (let call of calls) this.emit("call", call);
     });
@@ -227,21 +225,25 @@ class NekoEmit extends EventEmitter {
     );
   };
 
-  downloadMediaContent = async (Neko,M) => {
-    const stream = await downloadMediaMessage(
-      M,
-      "buffer",
-      {},
-      {
-        reuploadRequest: Neko.updateMediaMessage,
-      },
-    );
-    const dataType = await fileTypeFromBuffer(stream);
-    return {
-      data: stream,
-      mime: dataType.mime,
-      ext: dataType.ext,
-    };
+  downloadMediaContent = async (Neko, M) => {
+    try {
+      const stream = await downloadMediaMessage(
+        M,
+        "buffer",
+        {},
+        {
+          reuploadRequest: Neko.updateMediaMessage,
+        },
+      );
+      const dataType = await fileTypeFromBuffer(stream);
+      return {
+        data: stream,
+        mime: dataType.mime,
+        ext: dataType.ext,
+      };
+    } catch (error) {
+      throw Error("Failed to download media content");
+    }
   };
 
   error = async (err) => {

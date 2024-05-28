@@ -34,7 +34,7 @@ export default {
         text += `${[...uniqueCommands].join(", ")}_\n`;
       }
 
-      text += `\n\n⚠️ *Note:* Use ${M.prefix}help <command_name> for more info on a specific command. Example: *${M.prefix}help*`;
+      text += `\n\n> ⚠️ _*Note:* Use ${M.prefix}info <command_name> for more info on a specific command. Example: *${M.prefix}info menu*_`;
 
       let pics = [
         "https://i.waifu.pics/cjcIyzs.jpg",

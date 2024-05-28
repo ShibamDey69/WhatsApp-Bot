@@ -41,8 +41,8 @@ const sequilizer = async (Neko, m) => {
         const text = getMessageText(m.message, messageType);
         const from = m.key?.remoteJid;
         const isGroup = from?.endsWith("@g.us");
-        const sender = isGroup ? m.key?.participant : from;
-
+        const isMe = m.key?.fromMe;
+        const sender = isMe?`${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`:isGroup ? m.key?.participant : from;
         let groupMeta, admins;
         if (isGroup) {
             groupMeta = await Neko.groupMetadata(from);
@@ -51,10 +51,8 @@ const sequilizer = async (Neko, m) => {
             groupMeta = null;
             admins = [];
         }
-
         const ownerNumber = META_DATA.ownerNumber;
         const modsList = [...ownerNumber.map(v => `${v}@s.whatsapp.net`), ...mods];
-
         const mUpdated = {
             ...m,
             messageType,
@@ -86,17 +84,16 @@ const sequilizer = async (Neko, m) => {
             isCmd: text?.startsWith(META_DATA.prefix),
             isBotMsg: ["BAE5", "3EB0"].some(prefix => m.key?.id.startsWith(prefix) && [16, 12].includes(m.key?.id?.length)),
             isBotAdmin: isGroup ? admins.includes(`${Neko.user.id.split(":")[0]}@s.whatsapp.net`) : false,
-            isMod: mods.includes(sender),
+            isMod: modsList.includes(sender),
             mention: m.message?.[messageType]?.contextInfo?.mentionedJid || [],
             quoted: {
                 message: m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
                 sender: m.message?.extendedTextMessage?.contextInfo?.participant,
                 text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation,
             },
-            isMentioned: !!m.message?.[messageType]?.contextInfo?.mentionedJid,
+            isMentioned: m.message?.[messageType]?.contextInfo?.mentionedJid.length !== 0,
             isQuoted: !!m.message?.extendedTextMessage?.contextInfo?.quotedMessage
         };
-
         return mUpdated;
     } catch (error) {
         console.error(error);
