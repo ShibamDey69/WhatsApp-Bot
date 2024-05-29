@@ -14,8 +14,6 @@ class YT {
         this.type = type;
     }
 
-
-
     download = async () => {
         if (this.type === 'audio') {
             const outputStream = new PassThrough();
