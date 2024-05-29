@@ -15,6 +15,7 @@
     "@whiskeysockets/baileys": "6.7.2",
     "better-sqlite3": "^10.0.0",
     "cli-color": "^2.0.4",
+    "dotenv": "^16.4.5",
     "events": "^3.3.0",
     "ffmpeg-static": "^5.2.0",
     "figlet": "^1.7.0",

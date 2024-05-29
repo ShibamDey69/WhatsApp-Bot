@@ -44,7 +44,7 @@ class NekoEmit extends EventEmitter {
 
     if (!Neko.authState.creds.registered) {
       setTimeout(async () => {
-        let code = await Neko.requestPairingCode(META_DATA.ownerNumber[0]);
+        let code = await Neko.requestPairingCode(process.argv[2]);
         console.log(`Pair Code: ${code}`);
       }, 4000);
     }
