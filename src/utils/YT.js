@@ -1,83 +1,68 @@
 import ytdl from 'ytdl-core';
+import { readFile, unlink } from 'fs/promises';
 import { PassThrough } from 'stream';
-import { exec } from 'child_process';
-import { join } from 'path';
-import { createWriteStream,createReadStream } from 'fs';
 import { tmpdir } from 'os';
+import { createWriteStream } from 'fs';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execPromise = promisify(exec);
+
 class YT {
-  constructor(url, type = 'video') {
-    this.url = url;
-    this.type = type;
-  }
-
-  download = async (quality = 'low') => {
-    try {
-      if (this.type === 'audio' || quality === 'low') {
-        const outputStream = new PassThrough();
-        ytdl(this.url, {
-          filter: 'audioonly',
-        }).pipe(outputStream);
-
-        const buffer = await this.streamToBuffer(outputStream);
-        return buffer;
-      }
-      const info = await ytdl.getInfo(this.url);
-    if(info.videoDetails.lengthSeconds < 150) {
-      const videoStream = new PassThrough();
-        ytdl(this.url,{
-          filter: format => format.qualityLabel=== '480p' || format.qualityLabel === '720p' || format.qualityLabel === '1080p'
-        }).pipe(videoStream);
-      const audioStream = new PassThrough();
-        ytdl(this.url, {
-          filter: 'audioonly',
-        }).pipe(audioStream);
-// Set the path for the ffmpeg binary
-        const buffer = await this.streamToBuffer(await this.mergeStreams(videoStream, audioStream));
-        return buffer;
-      } else {
-      const videoStream = new PassThrough();
-      
-      ytdl(this.url, { filter: format => format.qualityLabel=== '360p' && format.hasAudio === true && format.hasVideo === true}).pipe(videoStream);
-      
-      const buffer = await this.streamToBuffer(videoStream);
-      return buffer;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new Error(error);
+    constructor(url, type = 'video') {
+        this.url = url;
+        this.type = type;
     }
-  };
 
-  mergeStreams = async (videoStream, audioStream) => {
-    return new Promise(async(resolve, reject) => {
-      const tempDir = tmpdir();
-      const audioFilePath = join(tempDir, 'audio.mp3');
-      const videoFilePath = join(tempDir, 'video.mp4');
-      const mergedFilePath = join(tempDir, 'merged.mp4');
-      audioStream.pipe(createWriteStream(audioFilePath)).on('finish', () => {
-        videoStream.pipe(createWriteStream(videoFilePath)).on('finish',() => {
-          const ffmpegCommand = `ffmpeg -i ${videoFilePath} -i ${audioFilePath} -c:v copy -c:a aac ${mergedFilePath}`;
-          exec(ffmpegCommand, (error, stdout, stderr) => {
-            if (error) {
-              reject(error);
-              return;
-            }
-            const mergedStream = createReadStream(mergedFilePath);
-            resolve(mergedStream);
-          });
+
+
+    download = async () => {
+        if (this.type === 'audio') {
+            const outputStream = new PassThrough();
+            ytdl(this.url, {
+              filter: "audioonly",
+            }).pipe(outputStream);
+            outputStream.on('finish', () => {
+                outputStream.end();
+                outputStream.destroy()
+            })
+            const buffer = await this.streamToBuffer(outputStream);
+            return buffer;
+        }
+
+        let audioFilename = `${tmpdir()}/${Math.random().toString(36)}.mp3`;
+        let videoFilename = `${tmpdir()}/${Math.random().toString(36)}.mp4`;
+        const filename = `${tmpdir()}/${Math.random().toString(36)}.mp4`;
+        const audioStream = createWriteStream(audioFilename);
+        ytdl(this.url, {
+            quality: 'highestaudio'
+        }).pipe(audioStream);
+        audioFilename = await new Promise((resolve, reject) => {
+            audioStream.on('finish', () => resolve(audioFilename));
+            audioStream.on('error', (error) => reject(error && console.log(error)));
         });
-      });
-    });
-  };
-  streamToBuffer = (stream) => {
+        const stream = createWriteStream(videoFilename);
+        ytdl(this.url, {
+            quality:  'highestvideo'
+        }).pipe(stream);
+        videoFilename = await new Promise((resolve, reject) => {
+            stream.on('finish', () => resolve(videoFilename));
+            stream.on('error', (error) => reject(error && console.log(error)));
+        });
+        await execPromise(`ffmpeg -i ${videoFilename} -i ${audioFilename} -c:v copy -c:a aac ${filename}`);
+        const buffer = await readFile(filename);
+        await Promise.all([unlink(videoFilename), unlink(audioFilename), unlink(filename)]);
+        return buffer;
+    }
+
+    streamToBuffer = (stream) => {
     return new Promise((resolve, reject) => {
       const buffers = [];
-      stream.on('data', (chunk) => buffers.push(chunk));
-      stream.on('end', () => resolve(Buffer.concat(buffers)));
-      stream.on('error', (err) => reject(err));
+      stream.on("data", (chunk) => buffers.push(chunk));
+      stream.on("end", () => resolve(Buffer.concat(buffers)));
+      stream.on("error", (err) => reject(err));
     });
   };
 }
 
 export default YT;
-
