@@ -1,32 +1,42 @@
 import { v4 as uuidv4 } from "uuid";
-import { QuickDB } from "quick.db";
 import path, { join } from "path";
+import fs from "fs";
+
 const __dirname = path.resolve();
+const userFilePath = join(__dirname, "src/tmp", "user.json");
+const groupFilePath = join(__dirname, "src/tmp", "group.json");
 
 class UserDbFunc {
   constructor() {
-    this.path = (name) => join(__dirname, "src/tmp", `${name}.sqlite`);
-    this.User = new QuickDB({ filePath: this.path("user") });
+    try {
+      if (!fs.existsSync(userFilePath)) {
+        fs.writeFileSync(userFilePath, JSON.stringify({}));
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
   }
 
   async getUser(Sender, name) {
     try {
       if (!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net", "");
-      let newUser =
-        (await this.User.get(sender)) ||
-        (await this.User.set(sender, {
-          _uid: uuidv4(),
-          user_id: Sender,
-          username: name || "No Name Found",
-          isPro:false,
-          isBanned: false,
-          isMod: false,
-          isMarried: false,
-          partner: null,
-          proposal:[]
-        }));
-      return newUser;
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let users = JSON.parse(fs.readFileSync(userFilePath));
+        let newUser =
+          users[sender] ||
+          (await this.setUser(sender, {
+            _uid: uuidv4(),
+            user_id: Sender,
+            username: name || "No Name Found",
+            isPro: false,
+            isBanned: false,
+            isMod: false,
+            isMarried: false,
+            partner: null,
+            proposal: [],
+          }));
+        return newUser;
       }
     } catch (error) {
       console.log(error);
@@ -36,25 +46,37 @@ class UserDbFunc {
 
   async filterUser(key, value) {
     try {
-      let users = await this.User.all();
-      let filter = users.filter((user) => user.value[key] === value);
+      let users = JSON.parse(fs.readFileSync(userFilePath));
+      let filter = Object.values(users).filter((user) => user[key] === value);
       return filter;
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }
 
-  
+  async setUser(userId, data) {
+    try {
+      let users = JSON.parse(fs.readFileSync(userFilePath));
+      users[userId] = data;
+      fs.writeFileSync(userFilePath, JSON.stringify(users));
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
   async setPremium(Sender, state = true) {
     try {
-      if(!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net","");
-      let premium = await this.getUser(sender);
-      if (!premium) {
-        throw new Error("User not found");
-      }
-      premium.isPro = state;
-      await this.User.set(sender, premium);
+      if (!Sender.endsWith("@g.us")) {
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let user = await this.getUser(sender);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        user.isPro = state;
+        await this.setUser(sender, user);
       }
     } catch (error) {
       console.log(error);
@@ -64,14 +86,14 @@ class UserDbFunc {
 
   async setBanned(Sender, state = true) {
     try {
-      if(!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net","");
-      let banned = await this.User.get(sender);
-      if (!banned) {
-        throw new Error("User not found");
-      }
-      banned.isBanned = state;
-      await this.User.set(sender, banned);
+      if (!Sender.endsWith("@g.us")) {
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let user = await this.getUser(sender);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        user.isBanned = state;
+        await this.setUser(sender, user);
       }
     } catch (error) {
       console.log(error);
@@ -82,13 +104,13 @@ class UserDbFunc {
   async setMod(Sender, state = true) {
     try {
       if (!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net", "");
-      let mod = await this.User.get(sender);
-      if (!mod) {
-        throw new Error("User not found");
-      }
-      mod.isMod = state;
-      await this.User.set(sender, mod);
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let user = await this.getUser(sender);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        user.isMod = state;
+        await this.setUser(sender, user);
       }
     } catch (error) {
       console.log(error);
@@ -96,18 +118,18 @@ class UserDbFunc {
     }
   }
 
-  async setMarried(Sender,partner, state = true,) {
+  async setMarried(Sender, partner, state = true) {
     try {
       if (!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net", "");
-      let married = await this.User.get(sender);
-      if (!married) {
-        throw new Error("User not found");
-      }
-      married.isMarried = state;
-      married.partner = partner;
-      married.proposal = [];
-      await this.User.set(sender, married);
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let user = await this.getUser(sender);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        user.isMarried = state;
+        user.partner = partner;
+        user.proposal = [];
+        await this.setUser(sender, user);
       }
     } catch (error) {
       console.log(error);
@@ -118,13 +140,13 @@ class UserDbFunc {
   async addProposal(Sender, partner) {
     try {
       if (!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net", "");
-      let proposal = await this.User.get(sender);
-      if (!proposal) {
-        throw new Error("User not found");
-      }
-      proposal.proposal.push(partner);
-      await this.User.set(sender, proposal);
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let user = await this.getUser(sender);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        user.proposal.push(partner);
+        await this.setUser(sender, user);
       }
     } catch (error) {
       console.log(error);
@@ -135,13 +157,13 @@ class UserDbFunc {
   async rejectProposal(Sender, partner) {
     try {
       if (!Sender.endsWith("@g.us")) {
-      let sender = Sender.replace("@s.whatsapp.net", "");
-      let proposal = await this.User.get(sender);
-      if (!proposal) {
-        throw new Error("User not found");
-      }
-      proposal.proposal = proposal.proposal.filter((p) => p !== partner);
-      await this.User.set(sender, proposal);
+        let sender = Sender.replace("@s.whatsapp.net", "");
+        let user = await this.getUser(sender);
+        if (!user) {
+          throw new Error("User not found");
+        }
+        user.proposal = user.proposal.filter((p) => p !== partner);
+        await this.setUser(sender, user);
       }
     } catch (error) {
       console.log(error);
@@ -152,28 +174,9 @@ class UserDbFunc {
 
 class GroupDbFunc {
   constructor() {
-    this.path = (name) => join(__dirname, "src/tmp", `${name}.sqlite`);
-    this.Group = new QuickDB({ filePath: this.path("group") });
-    
-  }
-  async getGroup(groupId, groupName) {
     try {
-      if(groupId.endsWith("@g.us")) {
-        let GroupId = groupId.replace("@g.us","");
-        let newGroup = (await this.Group.get(GroupId)) || (await this.Group.set(GroupId,{
-        _uid: uuidv4(),
-        group_id: groupId,
-        name: groupName || "No Name Found",
-        mode: "private",
-        isBanned: false,
-        isAntilink:false,
-        isWelcome:false,
-        isReassign:false,
-        isNsfw:false,
-        isAntiNsfw:false,
-        created: Date.now()
-      }));
-      return newGroup;
+      if (!fs.existsSync(groupFilePath)) {
+        fs.writeFileSync(groupFilePath, JSON.stringify({}));
       }
     } catch (error) {
       console.log(error);
@@ -181,27 +184,67 @@ class GroupDbFunc {
     }
   }
 
-   async filterGroup(key, value) {
-     try {
-        let groups = await this.Group.all();
-        let filter = groups.filter((group) => group.value[key] === value);
-        return filter;
-     } catch (error) {
-       console.log(error);
-        throw new Error(error);
-     }
-   }
+  async getGroup(groupId, groupName) {
+    try {
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        let newGroup =
+          groups[GroupId] ||
+          (await this.setGroup(GroupId, {
+            _uid: uuidv4(),
+            group_id: groupId,
+            name: groupName || "No Name Found",
+            mode: "private",
+            isBanned: false,
+            isAntilink: false,
+            isWelcome: false,
+            isReassign: false,
+            isNsfw: false,
+            isAntiNsfw: false,
+            created: Date.now(),
+          }));
+        return newGroup;
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async filterGroup(key, value) {
+    try {
+      let groups = JSON.parse(fs.readFileSync(groupFilePath));
+      let filter = Object.values(groups).filter((group) => group[key] === value);
+      return filter;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async setGroup(groupId, data) {
+    try {
+      let groups = JSON.parse(fs.readFileSync(groupFilePath));
+      groups[groupId] = data;
+      fs.writeFileSync(groupFilePath, JSON.stringify(groups));
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
 
   async setGcBanned(groupId, state = true) {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let banned = await this.Group.get(GroupId);
-      if (!banned) {
-        throw new Error("Group not found");
-      }
-      banned.isBanned = state;
-      await this.Group.set(GroupId, banned);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isBanned = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
       console.log(error);
@@ -211,101 +254,105 @@ class GroupDbFunc {
 
   async setGcAntilink(groupId, state = true) {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let antilink = await this.Group.get(GroupId);
-      if (!antilink) {
-        throw new Error("Group not found");
-      }
-      antilink.isAntilink = state;
-      await this.Group.set(GroupId, antilink);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isAntilink = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }
-  
+
   async setGcWelcome(groupId, state = true) {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let welcome = await this.Group.get(GroupId);
-      if (!welcome) {
-        throw new Error("Group not found");
-      }
-      welcome.isWelcome = state;
-      await this.Group.set(GroupId, welcome);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isWelcome = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }
 
   async setGcReassign(groupId, state = true) {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let reassign = await this.Group.get(GroupId);
-      if (!reassign) {
-        throw new Error("Group not found");
-      }
-      reassign.isReassign = state;
-      await this.Group.set(GroupId, reassign);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isReassign = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
-    console.log(error);
-    throw new Error(error);
+      console.log(error);
+      throw new Error(error);
     }
   }
 
   async setGcNsfw(groupId, state = true) {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let nsfw = await this.Group.get(GroupId);
-      if (!nsfw) {
-        throw new Error("Group not found");
-      }
-      nsfw.isNsfw = state;
-      await this.Group.set(GroupId, nsfw);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isNsfw = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }
 
   async setGcMode(groupId, mode = "private") {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let modeGc = await this.Group.get(GroupId);
-      if (!modeGc) {
-        throw new Error("Group not found");
-      }
-      modeGc.mode = mode;
-      await this.Group.set(GroupId, modeGc);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].mode = mode;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }
 
-  async setGcAntiNsfw(groupId, state = true){
+  async setGcAntiNsfw(groupId, state = true) {
     try {
-      if(groupId.endsWith("@g.us")) {
-      let GroupId = groupId.replace("@g.us","");
-      let antiNsfw = await this.Group.get(GroupId);
-      if (!antiNsfw) {
-        throw new Error("Group not found");
-      }
-      antiNsfw.isAntiNsfw = state;
-      await this.Group.set(GroupId, antiNsfw);
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isAntiNsfw = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {
+      console.log(error);
       throw new Error(error);
     }
   }
-} 
+}
 
-
-export default { UserDbFunc, GroupDbFunc};
+export default { UserDbFunc, GroupDbFunc };
