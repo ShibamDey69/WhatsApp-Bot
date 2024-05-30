@@ -1,20 +1,6 @@
 import clc from "cli-color";
-const Log = async (type, text, text2, context = "PRIVATE") => {
+const Log = async (type, text, context = "PRIVATE") => {
   switch (type.toString().toLowerCase()) {
-    case "status":
-      return console.log(
-        clc.green.bold("["),
-        clc.yellow.bold(text),
-        clc.green.bold("]"),
-        clc.blue(text2),
-      );
-    case "info":
-      return console.log(
-        clc.green.bold("["),
-        clc.yellow.bold("INFO"),
-        clc.green.bold("]"),
-        clc.blue(text),
-      );
     case "error":
       return console.log(
         clc.green.bold("["),
