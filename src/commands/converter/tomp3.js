@@ -14,6 +14,13 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
+      if (!M.args) {
+        return await Neko.sendTextMessage(
+          M.from,
+          "Please provide the type of audio you want to convert to.For more info --list",
+          M,
+        );
+      }
       if (!M.isQuoted) {
         return await Neko.sendTextMessage(
           M.from,
@@ -25,13 +32,6 @@ export default {
         return await Neko.sendTextMessage(
           M.from,
           "Please quote the video or audio you want to convert to audio.",
-          M,
-        );
-      }
-      if (!M.args) {
-        return await Neko.sendTextMessage(
-          M.from,
-          "Please provide the type of audio you want to convert to.For more info --list",
           M,
         );
       }
