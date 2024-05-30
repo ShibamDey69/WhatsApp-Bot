@@ -374,6 +374,11 @@ const messageHandler = async (Neko, m) => {
         try {
           const gc = await gc_db.getGroup(from,m?.groupMeta?.subject);
           await user_db.getUser(sender);
+          if (isGroup && text) {
+            Neko.log("message", `From: ${sender} | Message: ${text}`,null,"GROUP");
+          } else {
+            Neko.log("message", `From: ${sender} | Message: ${text}`,null,"PRIVATE");
+          }
           if (
             isGroup &&
             (await handleGroup(

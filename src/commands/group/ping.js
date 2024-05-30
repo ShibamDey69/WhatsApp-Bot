@@ -16,9 +16,9 @@ export default {
       const participants = M.groupMeta.participants.map((v) => v.id).filter((v) => v !== M.sender);
       const args = M.args || M.quoted.text;
       const hidden = args?.includes("--hidden") || args?.includes("-h");
-      const argument = hidden? args?.replace("--hidden", "")?.replace("-h", "") : args;
-      const arg = argument ?? `*No Text Provided*`;
-      let text =  `📬 *Message: ${arg?.trim()}*\n💬 *Group:* ${
+      const arg = hidden? args?.replace("--hidden", "")?.replace("-h", "") : args;
+      
+      let text =  `📬 *Message:* ${arg?.trim() || "No Text Message"}\n💬 *Group:* ${
             M.groupMeta.subject
         }\n👥 *Members:* ${participants.length}\n📣 *Tagger: @${
             M.sender.split('@')[0]

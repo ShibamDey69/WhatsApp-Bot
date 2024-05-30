@@ -1,5 +1,5 @@
 import clc from "cli-color";
-const Log = async (type, text, text2, This) => {
+const Log = async (type, text, text2, context = "PRIVATE") => {
   switch (type.toString().toLowerCase()) {
     case "status":
       return console.log(
@@ -27,7 +27,6 @@ const Log = async (type, text, text2, This) => {
         clc.green.bold("["),
         clc.magenta.bold("EVAL"),
         clc.green.bold("]"),
-        clc.blue(This.time),
         clc.green(text),
       );
     case "exec":
@@ -35,14 +34,21 @@ const Log = async (type, text, text2, This) => {
         clc.green.bold("["),
         clc.magenta.bold("EXEC"),
         clc.green.bold("]"),
-        clc.blue(This.time),
         clc.green(text),
       );
     case "connect":
       return console.log(clc.green.bold("[ ! ]"), clc.blue(text));
     case "message":
-      return console.log(clc.green.bold("[msg]"), clc.blue(text));
-  }
+      return console.log(
+  clc.blueBright(`[${context.toUpperCase()}]`),
+        clc.greenBright(
+          `[${new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Kolkata",
+          })}]`,
+        ),
+        clc.whiteBright(text),
+      );
+   }
 };
 
 export default Log;

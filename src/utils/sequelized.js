@@ -20,7 +20,7 @@ const getMessageText = (message, messageType) => {
     return message?.conversation ||
            message?.[messageType]?.text ||
            message?.[messageType]?.caption ||
-           message?.[messageType]?.contextInfo?.quotedMessage ||
+           message?.[messageType]?.contextInfo?.quotedMessage?.conversation ||
            messageType ||
            "";
 };
