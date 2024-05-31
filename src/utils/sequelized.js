@@ -8,12 +8,12 @@ const group_db = new DB.GroupDbFunc();
 
 const fetchUserData = async (filter) => {
     const users = await user_db.filterUser(filter, true);
-    return users.map(user => user.value.user_id);
+    return users.map(user => user?.user_id);
 };
 
 const fetchGroupData = async (filter) => {
     const groups = await group_db.filterGroup(filter, true);
-    return groups.map(group => group.value.group_id);
+    return groups.map(group => group?.group_id);
 };
 
 const getMessageText = (message, messageType) => {
