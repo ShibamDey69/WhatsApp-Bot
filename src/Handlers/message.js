@@ -175,6 +175,7 @@ const messageHandler = async (Neko, m) => {
         ) {
           const data = await Neko.downloadMediaContent(Neko, m);
           const res = await NsfwDetector(data);
+          console.log(res)
           if (
             res?.labelName === "NSFW Porn" ||
             res?.labelName === "SFW Mildly Suggestive"

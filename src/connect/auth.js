@@ -1,5 +1,12 @@
-import sessionSchema from "./authSchema.js";
+import { promises as fs } from 'fs';
+import path from 'path';
 import proto, { BufferJSON, initAuthCreds } from "@whiskeysockets/baileys";
+
+// Define the directory for storing session files
+const authInfoDir = path.resolve('./Auth-info');
+
+// Ensure the auth-info directory exists
+await fs.mkdir(authInfoDir, { recursive: true });
 
 class FileStorage {
     constructor() {
@@ -12,59 +19,41 @@ class FileStorage {
         }
 
         try {
-            const fileContent = await sessionSchema.findOne({
-                sessionId: fileName,
-            });
-            if (fileContent.session.length > 0) {
-                const content = JSON.parse(
-                    fileContent.session,
-                    BufferJSON.reviver,
-                );
-                this.fileCache.set(fileName, content);
-                return content;
-            }
+            const filePath = path.join(authInfoDir, fileName);
+            const fileContent = await fs.readFile(filePath, 'utf-8');
+            const content = JSON.parse(fileContent, BufferJSON.reviver);
+            this.fileCache.set(fileName, content);
+            return content;
         } catch (error) {
-            // Do nothing if the file does not exist
+            // Do nothing if the file does not exist or any other error occurs
         }
 
         return null;
     }
 
     async saveFile(fileName, content) {
-        const serializedContent = JSON.stringify(
-            content,
-            BufferJSON.replacer,
-            2,
-        );
+        const serializedContent = JSON.stringify(content, BufferJSON.replacer, 2);
+        const filePath = path.join(authInfoDir, fileName);
 
-        // Check if session with fileName exists
-        let session = await sessionSchema.findOne({ sessionId: fileName });
-
-        if (session) {
-            // If session exists, update it
-            session.session = serializedContent;
-            await session.save();
-        } else {
-            // If session doesn't exist, create a new one
-            session = await new sessionSchema({
-                sessionId: fileName,
-                session: serializedContent,
-            }).save();
+        try {
+            await fs.writeFile(filePath, serializedContent, 'utf-8');
+        } catch (error) {
+            console.error(`Failed to save file ${fileName}:`, error);
         }
-
-        return session;
     }
 
     async deleteFile(fileName) {
+        const filePath = path.join(authInfoDir, fileName);
+
         try {
-            await sessionSchema.deleteOne({ sessionId: fileName });
+            await fs.unlink(filePath);
         } catch (error) {
-            // Do nothing if the file does not exist
+            // Do nothing if the file does not exist or any other error occurs
         }
     }
 }
 
-export default class AuthenticationFromMongo {
+export default class Authentication {
     constructor(sessionId) {
         this.sessionId = sessionId;
         this.fileStorage = new FileStorage();
@@ -98,7 +87,7 @@ export default class AuthenticationFromMongo {
 
     async useMongoAuth() {
         if (!this.sessionId) return `Provide a valid session folder`;
-        const fileName = `${this.sessionId}`;
+        const fileName = `${this.sessionId}.json`;
 
         let storedCreds = await this.fileStorage.loadFile(fileName);
         let creds = storedCreds?.creds || initAuthCreds();
