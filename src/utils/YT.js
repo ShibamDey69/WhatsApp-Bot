@@ -15,6 +15,7 @@ class YT {
     }
 
     download = async () => {
+        try{
         if (this.type === 'audio') {
             const outputStream = new PassThrough();
             ytdl(this.url, {
@@ -51,6 +52,9 @@ class YT {
         const buffer = await readFile(filename);
         await Promise.all([unlink(videoFilename), unlink(audioFilename), unlink(filename)]);
         return buffer;
+        } catch(error) {
+            throw Error(error);
+        }
     }
 
     streamToBuffer = (stream) => {
