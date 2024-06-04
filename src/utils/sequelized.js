@@ -8,52 +8,66 @@ const group_db = new DB.GroupDbFunc();
 
 const fetchUserData = async (filter) => {
     const users = await user_db.filterUser(filter, true);
-    return users.map(user => user?.user_id);
+    return users.map((user) => user?.user_id);
 };
 
 const fetchGroupData = async (filter) => {
     const groups = await group_db.filterGroup(filter, true);
-    return groups.map(group => group?.group_id);
+    return groups.map((group) => group?.group_id);
 };
 
 const getMessageText = (message, messageType) => {
-    return message?.conversation ||
-           message?.[messageType]?.text ||
-           message?.[messageType]?.caption ||
-           message?.[messageType]?.contextInfo?.quotedMessage?.conversation ||
-           messageType ||
-           "";
+    return (
+        message?.conversation ||
+        message?.[messageType]?.text ||
+        message?.[messageType]?.caption ||
+        message?.[messageType]?.contextInfo?.quotedMessage?.conversation ||
+        messageType ||
+        ""
+    );
 };
 
 const sequilizer = async (Neko, m) => {
     try {
-        const [mods, pros, bans, GcBan, Antilink, Welcome, Reassign] = await Promise.all([
-            fetchUserData("isMod"),
-            fetchUserData("isPro"),
-            fetchUserData("isBanned"),
-            fetchGroupData("isBanned"),
-            fetchGroupData("isAntilink"),
-            fetchGroupData("isWelcome"),
-            fetchGroupData("isReassign")
-        ]);
+        const [mods, pros, bans, GcBan, Antilink, Welcome, Reassign] =
+            await Promise.all([
+                fetchUserData("isMod"),
+                fetchUserData("isPro"),
+                fetchUserData("isBanned"),
+                fetchGroupData("isBanned"),
+                fetchGroupData("isAntilink"),
+                fetchGroupData("isWelcome"),
+                fetchGroupData("isReassign"),
+            ]);
 
         const messageType = getContentType(m.message);
         const text = getMessageText(m.message, messageType);
         const from = m.key?.remoteJid;
         const isGroup = from?.endsWith("@g.us");
-        const quotedMessageType = getContentType(m.message?.extendedTextMessage?.contextInfo?.quotedMessage);
+        const quotedMessageType = getContentType(
+            m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
+        );
         const isMe = m.key?.fromMe;
-        const sender = isMe?`${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`:isGroup ? m.key?.participant : from;
+        const sender = isMe
+            ? `${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`
+            : isGroup
+              ? m.key?.participant
+              : from;
         let groupMeta, admins;
         if (isGroup) {
             groupMeta = await Neko.groupMetadata(from);
-            admins = groupMeta.participants.filter(v => v.admin).map(v => v.id);
+            admins = groupMeta.participants
+                .filter((v) => v.admin)
+                .map((v) => v.id);
         } else {
             groupMeta = null;
             admins = [];
         }
         const ownerNumber = META_DATA.ownerNumber;
-        const modsList = [...ownerNumber.map(v => `${v}@s.whatsapp.net`), ...mods];
+        const modsList = [
+            ...ownerNumber.map((v) => `${v}@s.whatsapp.net`),
+            ...mods,
+        ];
         const mUpdated = {
             ...m,
             messageType,
@@ -67,8 +81,15 @@ const sequilizer = async (Neko, m) => {
             admins,
             isAdmin: isGroup ? admins.includes(sender) : false,
             isOwner: ownerNumber.includes(sender?.split("@")[0]),
-            cmdName: text?.slice(META_DATA.prefix.length).trim().split(" ").shift().toLowerCase(),
-            args: text?.slice(META_DATA.prefix.length + text.split(" ")[0].length).trim(),
+            cmdName: text
+                ?.slice(META_DATA.prefix.length)
+                .trim()
+                .split(" ")
+                .shift()
+                .toLowerCase(),
+            args: text
+                ?.slice(META_DATA.prefix.length + text.split(" ")[0].length)
+                .trim(),
             mods: modsList,
             pro: [...modsList, ...pros],
             reassign: Reassign,
@@ -83,19 +104,36 @@ const sequilizer = async (Neko, m) => {
             isPro: [...modsList, ...pros].includes(sender),
             isReassign: Reassign.includes(from),
             isCmd: text?.startsWith(META_DATA.prefix),
-            isBotMsg: ["BAE5", "3EB0"].some(prefix => m.key?.id.startsWith(prefix) && [16, 12].includes(m.key?.id?.length)),
-            isBotAdmin: isGroup ? admins.includes(`${Neko.user.id.split(":")[0]}@s.whatsapp.net`) : false,
+            isBotMsg: ["BAE5", "3EB0"].some(
+                (prefix) =>
+                    m.key?.id.startsWith(prefix) &&
+                    [16, 12].includes(m.key?.id?.length),
+            ),
+            isBotAdmin: isGroup
+                ? admins.includes(
+                      `${Neko.user.id.split(":")[0]}@s.whatsapp.net`,
+                  )
+                : false,
             isMod: modsList.includes(sender),
+            isStatus:
+                m.message[messageType]?.contextInfo?.remoteJid?.endsWith(
+                    "status@broadcast",
+                ),
             mention: m.message?.[messageType]?.contextInfo?.mentionedJid || [],
             quoted: {
-                mtype: quotedMessageType?.replace("Message",""),
-                message: m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
-                sender: m.message?.extendedTextMessage?.contextInfo?.participant,
-                text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage?.conversation,
-                
+                mtype: quotedMessageType?.replace("Message", ""),
+                message:
+                    m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
+                sender: m.message?.extendedTextMessage?.contextInfo
+                    ?.participant,
+                text: m.message?.extendedTextMessage?.contextInfo?.quotedMessage
+                    ?.conversation,
             },
-            isMentioned: m.message?.[messageType]?.contextInfo?.mentionedJid.length !== 0,
-            isQuoted: m.message?.extendedTextMessage?.contextInfo?.quotedMessage
+            isMentioned:
+                m.message?.[messageType]?.contextInfo?.mentionedJid.length !==
+                0,
+            isQuoted:
+                m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
         };
         return mUpdated;
     } catch (error) {

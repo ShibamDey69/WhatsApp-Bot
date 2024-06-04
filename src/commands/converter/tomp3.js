@@ -74,10 +74,10 @@ export default {
           );
           break;
       }
-      await Neko.sendMessage(
+      return await Neko.sendAudioMessage(
         M.from,
-        { audio: audio, mimetype: "audio/mpeg" },
-        { quoted: M },
+        audio,
+        M
       );
       return;
     } catch (error) {

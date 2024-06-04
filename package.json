@@ -8,7 +8,7 @@
   "license": "ISC",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js 917047584741 && export SESSION_ID=SHIBAM"
+    "start": " export SESSION_ID=SHIBAM && node src/index.js 917047584741"
   },
   "type": "module",
   "dependencies": {

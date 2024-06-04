@@ -175,9 +175,8 @@ const messageHandler = async (Neko, m) => {
         ) {
           const data = await Neko.downloadMediaContent(Neko, m);
           const res = await NsfwDetector(data);
-          console.log(res)
           if (
-            res?.labelName === "NSFW Porn" ||
+            res?.labelName.includes("NSFW") ||
             res?.labelName === "SFW Mildly Suggestive"
           ) {
             await Neko.sendMessage(from, { delete: m.key });
@@ -330,8 +329,7 @@ const messageHandler = async (Neko, m) => {
           return true;
         }
       } catch (error) {
-        console.log(error);
-        return;
+        throw new Error(error);;
       }
    };
 
@@ -354,11 +352,7 @@ const messageHandler = async (Neko, m) => {
         if (operation.retry(error)) {
           Neko.log("error", `Attempt ${currentAttempt} failed. Retrying...`);
           if (currentAttempt === 2) {
-            await Neko.sendTextMessage(
-              from,
-              "*Failed to process the message...*",
-              m,
-            );
+            await Neko.sendReactMessage(from, "❌", m);
             console.log(error);
             Neko.log("error", `Maximum Retry Attempts Reached`);
             return;
