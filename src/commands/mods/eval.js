@@ -1,6 +1,6 @@
 export default {
   name: "eval",
-  alias: ["ev"],
+  aliases: ["ev"],
   desc: "Evaluate a JavaScript expression",
   category: "mods",
   usage: `eval <expression>`,

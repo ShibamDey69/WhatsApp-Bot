@@ -10,7 +10,7 @@ const loadCommands = () => {
         for (let file of files) {
           let cmd = await import(`../commands/${folder}/${file}`);
           commands.set(cmd.default?.name, cmd.default);
-          cmd.default?.alias?.forEach((cmdName) => commands.set(cmdName, cmd.default));
+          cmd.default?.aliases?.forEach((cmdName) => commands.set(cmdName, cmd.default));
         }
       }
       resolve(commands);

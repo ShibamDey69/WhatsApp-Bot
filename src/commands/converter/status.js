@@ -1,10 +1,10 @@
 export default {
   name: "status",
-  alias: ["status"],
+  aliases: ["status"],
   description: "Get the status of the ",
   usage: "status",
   category: "Converter",
-  react: "🎀",
+  cooldown: 5,
   isMod: false,
   isPro: false,
   isGroup: false,

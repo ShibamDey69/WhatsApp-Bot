@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 export default {
   name: "pm2",
-  alias: ["pm2"],
+  aliases: ["pm2"],
   desc: "Restart the bot",
   category: "mods",
   usage: `pm2`,

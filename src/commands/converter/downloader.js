@@ -1,10 +1,10 @@
 import { fileTypeFromBuffer } from "file-type";
 import insta from "instagram-url-direct";
 import axios from "axios";
-import YT from "../../utils/YT.js";
+import YT from "../../utils/ytdl.js";
 export default {
   name: "download",
-  alias: ["dl", "down"],
+  aliases: ["dl", "down"],
   desc: "Download media from various sources",
   category: "converter",
   usage: `downloader <url>`,

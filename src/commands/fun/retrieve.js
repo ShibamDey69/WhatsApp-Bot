@@ -1,4 +1,4 @@
-import { fileTypeFromBuffer } from "file-type";
+
 export default {
   name: "retrieve",
   alias: ["rv"],

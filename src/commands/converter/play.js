@@ -1,5 +1,5 @@
 import yts from "yt-search";
-import YT from "../../utils/YT.js";
+import YT from "../../utils/ytdl.js";
 
 export default {
   name: "play",

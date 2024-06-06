@@ -16,7 +16,7 @@ class TelegramScraper {
         },
       );
 
-      const stickers = res.data.result;
+      const stickers = res.data?.result;
       const linkPromises = stickers?.stickers.map(async (item) => {
         const pathResponse = await axios.post(
           `https://api.telegram.org/bot${this.token}/getFile`,
@@ -24,7 +24,7 @@ class TelegramScraper {
             file_id: item.file_id,
           },
         );
-        return pathResponse.data.result;
+        return pathResponse.data?.result;
       });
 
       const results = await Promise.allSettled(linkPromises);

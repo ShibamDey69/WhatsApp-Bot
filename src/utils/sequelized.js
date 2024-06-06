@@ -29,6 +29,7 @@ const getMessageText = (message, messageType) => {
 
 const sequilizer = async (Neko, m) => {
     try {
+        if (m.key?.remoteJid === "status@broadcast") return;
         const [mods, pros, bans, GcBan, Antilink, Welcome, Reassign] =
             await Promise.all([
                 fetchUserData("isMod"),
@@ -116,7 +117,7 @@ const sequilizer = async (Neko, m) => {
                 : false,
             isMod: modsList.includes(sender),
             isStatus:
-                m.message[messageType]?.contextInfo?.remoteJid?.endsWith(
+                m.message?.extendedTextMessage?.contextInfo?.remoteJid?.endsWith(
                     "status@broadcast",
                 ),
             mention: m.message?.[messageType]?.contextInfo?.mentionedJid || [],

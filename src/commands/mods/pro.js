@@ -1,9 +1,9 @@
 export default {
-  name: "mod",
-  aliases: ["mod"],
+  name: "pro",
+  aliases: ["pro"],
   description: "Set or unset a user's mod status",
   category: "mods",
-  usage: "mod @tag/mention --true/false",
+  usage: "pro @tag/mention --true/false",
   cooldown: 5,
   isAdmin: false,
   isBotAdmin: false,
@@ -13,10 +13,10 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      // Determine the user to be modified and the new mod status
+      // Determine the user to be modified and the new pro status
       let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
       if (!user) {
-        return Neko.sendTextMessage(M.from, "Please mention or quote a user to modify their mod status.", M);
+        return Neko.sendTextMessage(M.from, "Please mention or quote a user to modify their pro status.", M);
       }
 
       let status = M.text.split('--')[1]?.trim();
@@ -30,18 +30,18 @@ export default {
       if (usr.isMod === isMod) {
         return Neko.sendMentionMessage(
           M.from,
-          `User *@${userId}* is already ${isMod ? "a mod" : "not a mod"}.`,
+          `User *@${userId}* is already ${isMod ? "a pro user" : "not a pro user"}.`,
           [user],
           M,
         );
       }
 
-      // Update the user's mod status
+      // Update the user's pro status
       await Neko.user_db.setMod(userId, isMod);
       let action = isMod ? "promoted to" : "demoted from";
       return Neko.sendMentionMessage(
         M.from,
-        `User *@${userId}* has been ${action} mod status.`,
+        `User *@${userId}* has been ${action} pro status.`,
         [user],
         M,
       );

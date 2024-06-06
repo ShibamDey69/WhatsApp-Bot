@@ -1,7 +1,7 @@
 import converter from "../../utils/converter.js";
 export default {
   name: "toaudio",
-  alias: ["tomp3", "adch"],
+  aliases: ["tomp3", "adch"],
   desc: "Converts a video or audio to different version of audio",
   category: "converter",
   usage: `tomp3 <args> qoute/tag the video/audio`,

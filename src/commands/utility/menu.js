@@ -15,10 +15,10 @@ export default {
     try {
       // Initial menu text with bot name and user information
       let text = `\n*╭─「 (づ￣ ³￣)づ 」*
-*│ ɴᴀᴍᴇ:* ${Neko.user.name}
-*│ ᴜsᴇʀ: @${M.sender.split("@")[0]}*
-*│ ᴘʀᴇғɪx:* "${M.prefix}"
-*│ ᴏᴡɴᴇʀ:* *Neko-Kun*
+*│ NAME:* ${Neko.user.name}
+*│ USER: @${M.sender.split("@")[0]}*
+*│ PREFIX:* "${M.prefix}"
+*│ DEV:* *Neko-Kun*
 *╰────────────┈平和* \n\n𝐓𝐡𝐞𝐬𝐞 𝐚𝐫𝐞 𝐭𝐡𝐞 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐬 𝐲𝐨𝐮 𝐜𝐚𝐧 𝐮𝐬𝐞~ ツ\n`;
 
       let commands = Array.from(Neko.commands.values());
@@ -28,7 +28,9 @@ export default {
         text += `\n> *${category.toUpperCase()}*\n❐ _`;
         let uniqueCommands = new Set();
 
-        for (let cmd of commands.filter((cmd) => cmd.category === category)) {
+        for (let cmd of commands.filter(
+          (cmd) => cmd.category.toLowerCase() === category.toLowerCase(),
+        )) {
           uniqueCommands.add(cmd.name);
         }
         text += `${[...uniqueCommands].join(", ")}_\n`;
@@ -43,7 +45,7 @@ export default {
       let pic = pics[Math.floor(Math.random() * pics.length)];
       // Send the menu text as a message
       await Neko.sendMessage(M.from, {
-        image: {url:pic},
+        image: { url: pic },
         caption: text,
         mentions: [M.sender],
       });

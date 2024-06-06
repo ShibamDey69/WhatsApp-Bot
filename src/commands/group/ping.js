@@ -18,7 +18,7 @@ export default {
       const hidden = args?.includes("--hidden") || args?.includes("-h");
       const arg = hidden? args?.replace("--hidden", "")?.replace("-h", "") : args;
       
-      let text =  `📬 *Message:* ${arg?.trim() || "No Text Message"}\n💬 *Group:* ${
+      let text =  `📬 *Message:* *${arg?.trim() || "No Text Message"}* \n💬 *Group:* ${
             M.groupMeta.subject
         }\n👥 *Members:* ${participants.length}\n📣 *Tagger: @${
             M.sender.split('@')[0]

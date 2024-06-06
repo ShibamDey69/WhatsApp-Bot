@@ -8,7 +8,7 @@ import { promisify } from 'util';
 
 const execPromise = promisify(exec);
 
-class YT {
+export default class YTDL {
     constructor(url, type = 'video') {
         this.url = url;
         this.type = type;
@@ -66,5 +66,3 @@ class YT {
     });
   };
 }
-
-export default YT;

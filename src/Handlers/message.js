@@ -26,21 +26,20 @@ class Queue {
   }
 
   async saveQueueToFile() {
-    try{
-    await fs
-      .writeFile(this.filePath, JSON.stringify(this.queue), "utf8");
+    try {
+      await fs.writeFile(this.filePath, JSON.stringify(this.queue), "utf8");
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
   async enqueue(funcString, ...args) {
-    try{
-    this.queue.push({ funcString, args });
-    await this.saveQueueToFile();
-    if (!this.processing) await this.processQueue();
+    try {
+      this.queue.push({ funcString, args });
+      await this.saveQueueToFile();
+      if (!this.processing) await this.processQueue();
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -110,14 +109,18 @@ const messageHandler = async (Neko, m) => {
           m.message?.conversation ||
           m.message?.[messageType]?.text ||
           m.message?.[messageType]?.caption ||
-          m.messageType ||
+          messageType ||
           "";
         const isCmd = text.toString().startsWith(Neko.prefix);
         const from = m.key.remoteJid;
         const isGroup = from?.endsWith("@g.us");
         const isMe = m.key?.fromMe;
-        const sender = isMe?`${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`:isGroup ? m.key?.participant : from;
-        return [messageType, text, isCmd, from, isGroup,sender];
+        const sender = isMe
+          ? `${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`
+          : isGroup
+            ? m.key?.participant
+            : from;
+        return [messageType, text, isCmd, from, isGroup, sender];
       };
 
       const handleGroup = async (
@@ -129,7 +132,7 @@ const messageHandler = async (Neko, m) => {
         text,
         from,
         sequilizer,
-        sender
+        sender,
       ) => {
         if (gc.isBanned && isCmd) {
           const M = await sequilizer(Neko, m);
@@ -183,7 +186,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendMentionMessage(
               from,
               `*_This is a warning! @${sender.split("@")[0]} if you send nsfw again! You can get kicked from this group_*`,
-              [sender]
+              [sender],
             );
             return true;
           }
@@ -218,120 +221,126 @@ const messageHandler = async (Neko, m) => {
         sequilizer,
         user_db,
       ) => {
-    try {
-        Neko.user_db = user_db;
-        Neko.gc_db = gc_db;
-        const M = await sequilizer(Neko, m);
-        if (gc?.mode === "private" && !M?.isMod && isGroup) return false;
+        try {
+          Neko.user_db = user_db;
+          Neko.gc_db = gc_db;
+          const M = await sequilizer(Neko, m);
+          if (gc?.mode === "private" && !M?.isMod && isGroup) return false;
 
-        if (gc?.mode === "admin" && (!M?.isAdmin || !M?.isMod) && isGroup)
-          return false;
+          if (gc?.mode === "admin" && (!M?.isAdmin || !M?.isMod) && isGroup)
+            return false;
 
-        if (M?.quoted.sender || M.mention[0]) {
-          if (M?.mention) {
-            M.mention.forEach(async (mention) => {
-              await user_db.getUser(mention, M.pushName);
-            });
+          if (M?.quoted.sender || M.mention[0]) {
+            if (M?.mention) {
+              M.mention.forEach(async (mention) => {
+                await user_db.getUser(mention, M.pushName);
+              });
+            } else {
+              await user_db.getUser(M.quoted.sender, M.pushName);
+            }
+          }
+
+          if (M?.isGcBanned && M?.isGroup && !M.isMod) {
+            await Neko.sendReactMessage(M.from, "❌", M);
+            await Neko.sendTextMessage(
+              M.from,
+              "This group is banned from using this bot",
+              M,
+            );
+            return true;
+          }
+
+          if (M?.isBanned) {
+            await Neko.sendReactMessage(M.from, "❌", M);
+            await Neko.sendTextMessage(
+              M.from,
+              "You are banned from using the bot",
+              M,
+            );
+            return true;
+          }
+
+          await Neko.sendReactMessage(M.from, "♥️", M);
+          if (Neko?.commands?.has(M?.cmdName)) {
+            const cmd = Neko?.commands.get(M?.cmdName);
+            if (!M?.isGroup && !M?.isMod && !M?.isPro) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(
+                M.from,
+                "You Must Be a Mod or Pro To Use This Command In DM",
+                M,
+              );
+              return true;
+            }
+
+            if (cmd?.isGroup && !M?.isGroup) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(
+                M.from,
+                "You Must Use This Command In a Group",
+                M,
+              );
+              return true;
+            }
+
+            if (cmd.isOwner && !M?.isOwner) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(
+                M.from,
+                "You Must Be the Owner To use This Command",
+                M,
+              );
+              return true;
+            }
+
+            if (cmd?.isAdmin && !M?.isAdmin && !M.isMod) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(
+                M.from,
+                "You Must Be an Admin To use This Command",
+                M,
+              );
+              return true;
+            }
+
+            if (cmd?.isBotAdmin && !M.isBotAdmin) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(
+                M.from,
+                "The Bot Must Be an Admin To use This Command",
+                M,
+              );
+              return true;
+            }
+
+            if (cmd?.isMod && !M?.isMod) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(
+                M.from,
+                "You Must Be a Mod To use This Command",
+                M,
+              );
+              return true;
+            }
+
+            return await cooldown(
+              M.sender,
+              cmd.cooldown * 1000 ?? 5000,
+              cmd.run,
+              Neko,
+              M,
+            );
           } else {
-            await user_db.getUser(M.quoted.sender, M.pushName);
+            if (M.from) {
+              await Neko.sendReactMessage(M.from, "❌", M);
+              await Neko.sendTextMessage(M.from, "Command not found!", M);
+            }
+            return true;
           }
+        } catch (error) {
+          throw new Error(error);
         }
-
-        if (M?.isGcBanned && M?.isGroup && !M.isMod) {
-          await Neko.sendReactMessage(M.from, "❌", M);
-          await Neko.sendTextMessage(
-            M.from,
-            "This group is banned from using this bot",
-            M,
-          );
-          return true;
-        }
-
-        if (M?.isBanned) {
-          await Neko.sendReactMessage(M.from, "❌", M);
-          await Neko.sendTextMessage(
-            M.from,
-            "You are banned from using the bot",
-            M,
-          );
-          return true;
-        }
-
-        await Neko.sendReactMessage(M.from, "♥️", M);
-        if (Neko?.commands?.has(M?.cmdName)) {
-          const cmd = Neko?.commands.get(M?.cmdName);
-          if (!M?.isGroup && !M?.isMod && !M?.isPro) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(
-              M.from,
-              "You Must Be a Mod or Pro To Use This Command In DM",
-              M,
-            );
-            return true;
-          }
-
-          if (cmd?.isGroup && !M?.isGroup) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(
-              M.from,
-              "You Must Use This Command In a Group",
-              M,
-            );
-            return true;
-          }
-
-          if (cmd.isOwner && !M?.isOwner) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(
-              M.from,
-              "You Must Be the Owner To use This Command",
-              M,
-            );
-            return true;
-          }
-
-          if (cmd?.isAdmin && !M?.isAdmin && !M.isMod) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(
-              M.from,
-              "You Must Be an Admin To use This Command",
-              M,
-            );
-            return true;
-          }
-
-          if (cmd?.isBotAdmin && !M.isBotAdmin) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(
-              M.from,
-              "The Bot Must Be an Admin To use This Command",
-              M,
-            );
-            return true;
-          }
-
-          if (cmd?.isMod && !M?.isMod) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(
-              M.from,
-              "You Must Be a Mod To use This Command",
-              M,
-            );
-            return true;
-          }
-
-          return await cooldown(M.sender, 5000, cmd.run, Neko, M);
-        } else {
-          if (M.from) {
-            await Neko.sendReactMessage(M.from, "❌", M);
-            await Neko.sendTextMessage(M.from, "Command not found!", M);
-          }
-          return true;
-        }
-      } catch (error) {
-        throw new Error(error);;
-      }
-   };
+      };
 
       const handleErrors = async (
         error,
@@ -339,7 +348,7 @@ const messageHandler = async (Neko, m) => {
         currentAttempt,
         Neko,
         m,
-        from
+        from,
       ) => {
         if (error.data?.status === 429) {
           const retryAfter =
@@ -349,7 +358,7 @@ const messageHandler = async (Neko, m) => {
           }
         }
         if (error.data?.status === 403) return;
-        if (operation.retry(error)) {
+        if (currentAttempt < 3 && operation.retry(error)) {
           Neko.log("error", `Attempt ${currentAttempt} failed. Retrying...`);
           if (currentAttempt === 2) {
             await Neko.sendReactMessage(from, "❌", m);
@@ -361,18 +370,18 @@ const messageHandler = async (Neko, m) => {
       };
 
       await operation.attempt(async (currentAttempt) => {
-        const [messageType, text, isCmd, from, isGroup,sender] = parseMessage(
-            Neko,
-            m,
-            getContentType,
-          );
+        const [messageType, text, isCmd, from, isGroup, sender] = parseMessage(
+          Neko,
+          m,
+          getContentType,
+        );
         try {
-          const gc = await gc_db.getGroup(from,m?.groupMeta?.subject);
-          await user_db.getUser(sender);
+          const gc = await gc_db.getGroup(from, m?.groupMeta?.subject);
+          await user_db.getUser(sender, m.pushName);
           if (isGroup && text) {
-            Neko.log("message", `From: ${sender.split("@")[0]} | Message: ${text}`,"GROUP");
-          } else if(!isGroup && text) {
-            Neko.log("message", `From: ${sender.split("@")[0]} | Message: ${text}`,"PRIVATE");
+            Neko.log("message", `${m.pushName || "Bot"} | ${text}`, "GROUP");
+          } else if (!isGroup && text) {
+            Neko.log("message", `${m.pushName || "Bot"} | ${text}`, "PRIVATE");
           }
           if (
             isGroup &&
@@ -385,7 +394,7 @@ const messageHandler = async (Neko, m) => {
               text,
               from,
               sequilizer,
-              sender
+              sender,
             ))
           )
             return;
@@ -396,7 +405,7 @@ const messageHandler = async (Neko, m) => {
           )
             return;
         } catch (error) {
-          await handleErrors(error, operation, currentAttempt, Neko, m,from);
+          await handleErrors(error, operation, currentAttempt, Neko, m, from);
         }
       });
     };

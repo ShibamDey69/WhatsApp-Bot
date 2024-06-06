@@ -1,6 +1,6 @@
 export default {
   name: "mode",
-  alias: ["mode"],
+  aliases: ["mode"],
   description: "Set or unset a user's mod status",
   category: "mods",
   usage: "mode ?=<mode> --true/false",
