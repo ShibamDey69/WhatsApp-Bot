@@ -1,6 +1,6 @@
 export default {
   name: "reminder",
-  alias: ["remind", "alarm"],
+  aliases: ["remind", "alarm"],
   category: "Utility",
   description: "Set a reminder",
   usage: "reminder --time=[duration] [message]",

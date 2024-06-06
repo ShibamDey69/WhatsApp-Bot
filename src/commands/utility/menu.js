@@ -1,6 +1,6 @@
 export default {
   name: "menu",
-  alias: ["help", "h"],
+  aliases: ["help", "h"],
   desc: "Displays the menu",
   category: "Utility",
   usage: `menu`,

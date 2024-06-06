@@ -1,6 +1,6 @@
 export default {
   name: "mods",
-  alias: ["mods"],
+  aliases: ["mods"],
   desc: "List of mods",
   category: "Utility",
   usage: `mods`,

@@ -1,6 +1,6 @@
 export default {
   name: "info",
-  alias: ["info", "i"],
+  aliases: ["info", "i"],
   desc: "Get information about a command",
   category: "Utility",
   usage: `info <command name>`,
