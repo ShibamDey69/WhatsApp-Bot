@@ -1,52 +1,58 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import fsSync, { promises as fs } from "fs";
+import path from "path";
 import proto, { BufferJSON, initAuthCreds } from "@whiskeysockets/baileys";
-
-// Define the directory for storing session files
-const authInfoDir = path.resolve('./Auth-info');
-
-// Ensure the auth-info directory exists
-await fs.mkdir(authInfoDir, { recursive: true });
+import AsyncLock from "async-lock";
+const fileLock = new AsyncLock({ maxPending: Infinity });
 
 class FileStorage {
-    constructor() {
+    constructor(folder = "./Auth-info") {
+        this.authInfoDir = path.resolve(folder);
         this.fileCache = new Map();
+   if(!fsSync.existsSync(this.authInfoDir)) {
+           fsSync.mkdirSync(this.authInfoDir);
+        }
     }
 
     async loadFile(fileName) {
-        if (this.fileCache.has(fileName)) {
-            return this.fileCache.get(fileName);
-        }
-
         try {
-            const filePath = path.join(authInfoDir, fileName);
-            const fileContent = await fs.readFile(filePath, 'utf-8');
+            if (this.fileCache.has(fileName)) {
+            return this.fileCache.get(fileName);
+            }
+            
+            const filePath = path.join(this.authInfoDir, fileName);
+            const fileContent = await fileLock.acquire(filePath, () =>
+                fs.readFile(filePath, { encoding: "utf-8" }),
+            );
             const content = JSON.parse(fileContent, BufferJSON.reviver);
             this.fileCache.set(fileName, content);
             return content;
         } catch (error) {
-            // Do nothing if the file does not exist or any other error occurs
+            return null;
         }
-
-        return null;
     }
 
     async saveFile(fileName, content) {
-        const serializedContent = JSON.stringify(content, BufferJSON.replacer, 2);
-        const filePath = path.join(authInfoDir, fileName);
-
         try {
-            await fs.writeFile(filePath, serializedContent, 'utf-8');
+            const serializedContent = JSON.stringify(
+            content,
+            BufferJSON.replacer,
+            2,
+        );
+        const filePath = path.join(this.authInfoDir, fileName);
+            
+            return await fileLock.acquire(filePath, () =>
+                fs.writeFile(filePath, serializedContent),
+            );
         } catch (error) {
             console.error(`Failed to save file ${fileName}:`, error);
         }
     }
 
     async deleteFile(fileName) {
-        const filePath = path.join(authInfoDir, fileName);
-
         try {
-            await fs.unlink(filePath);
+            const filePath = path.join(this.authInfoDir, fileName);
+
+            return await fileLock.acquire(filePath, () => fs.unlink(filePath));
         } catch (error) {
             // Do nothing if the file does not exist or any other error occurs
         }
@@ -54,9 +60,9 @@ class FileStorage {
 }
 
 export default class Authentication {
-    constructor(sessionId) {
+    constructor(sessionId, folder) {
         this.sessionId = sessionId;
-        this.fileStorage = new FileStorage();
+        this.fileStorage = new FileStorage(folder);
         this.KEY_MAP = {
             "pre-key": "preKeys",
             session: "sessions",
@@ -85,8 +91,8 @@ export default class Authentication {
         };
     }
 
-    async useMongoAuth() {
-        if (!this.sessionId) return `Provide a valid session folder`;
+    async singleFileAuth() {
+        if (!this.sessionId) throw new Error(`Provide a valid session folder`);
         const fileName = `${this.sessionId}.json`;
 
         let storedCreds = await this.fileStorage.loadFile(fileName);

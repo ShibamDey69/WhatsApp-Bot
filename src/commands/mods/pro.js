@@ -24,10 +24,10 @@ export default {
         return Neko.sendTextMessage(M.from, "Please specify the status as --true or --false.", M);
       }
 
-      let isMod = status === "true";
+      let isPro = status === "true";
       let userId = user.split("@")[0];
       let usr = await Neko.user_db.getUser(userId);
-      if (usr.isMod === isMod) {
+      if (usr.isPro === isPro) {
         return Neko.sendMentionMessage(
           M.from,
           `User *@${userId}* is already ${isMod ? "a pro user" : "not a pro user"}.`,
@@ -37,8 +37,8 @@ export default {
       }
 
       // Update the user's pro status
-      await Neko.user_db.setMod(userId, isMod);
-      let action = isMod ? "promoted to" : "demoted from";
+      await Neko.user_db.setMod(userId, isPro);
+      let action = isPro ? "promoted to" : "demoted from";
       return Neko.sendMentionMessage(
         M.from,
         `User *@${userId}* has been ${action} pro status.`,

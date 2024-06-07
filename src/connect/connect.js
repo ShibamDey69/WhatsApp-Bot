@@ -3,7 +3,10 @@ import {
   fetchLatestWaWebVersion,
   downloadMediaMessage,
   generateWAMessageFromContent,
+  makeInMemoryStore,
+  makeCacheableSignalKeyStore,
 } from "@whiskeysockets/baileys";
+import NodeCache from "node-cache";
 import fs from "fs";
 import Pino from "pino";
 import EventEmitter from "events";
@@ -19,6 +22,14 @@ const loggerOptions = { level: "silent" };
 const logger = Pino(loggerOptions).child({
   level: "silent",
 });
+const msgRetryCounterCache = new NodeCache();
+const store = makeInMemoryStore({ logger });
+
+store?.readFromFile("./src/tmp/baileys_store_multi.json");
+// save every 10s
+setInterval(() => {
+  store?.writeToFile("./src/tmp/baileys_store_multi.json");
+}, 10_000);
 
 class NekoEmit extends EventEmitter {
   constructor(config) {
@@ -28,20 +39,58 @@ class NekoEmit extends EventEmitter {
     this.logger = logger;
   }
   async connect() {
-    const SingleAuth = new Authentication(
-      `${this.socketConfig.session}`,
-    );
-    const { saveCreds, clearState, state } = await SingleAuth.useMongoAuth();
+    const SingleAuth = new Authentication(`${this.socketConfig.session}`);
+    const { saveCreds, clearState, state } = await SingleAuth.singleFileAuth();
 
     const { version, isLatest } = await fetchLatestWaWebVersion({});
     const Neko = makeWASocket({
       ...this.socketConfig,
       logger,
-      auth: state,
+      auth: {
+        creds: state.creds,
+        keys: makeCacheableSignalKeyStore(state.keys, logger),
+      },
+      msgRetryCounterCache,
       browser: ["Ubuntu", "Chrome", "20.0.04"],
       version,
+      shouldSyncHistoryMessage: true,
+      printQRInTerminal: false,
+      syncFullHistory: true,
+      generateHighQualityLinkPreview: true,
+      patchMessageBeforeSending: (message) => {
+        const requiresPatch = !!(
+          message.buttonsMessage ||
+          message.templateMessage ||
+          message.listMessage
+        );
+        if (requiresPatch) {
+          message = {
+            viewOnceMessage: {
+              message: {
+                messageContextInfo: {
+                  deviceListMetadataVersion: 2,
+                  deviceListMetadata: {},
+                },
+                ...message,
+              },
+            },
+          };
+        }
+        return message;
+      },
+      getMessage: async (key) => {
+        if (store) {
+          const msg = await store.loadMessage(key.remoteJid, key.id);
+          return msg.message || undefined;
+        }
+        console.log("store is undefined");
+        return {
+          conversation: "An error occurred while trying to fetch the message.",
+        };
+      },
+      msgRetryCounterMap: 3,
     });
-
+    store?.bind(Neko.ev);
     if (!Neko.authState.creds.registered) {
       setTimeout(async () => {
         let code = await Neko.requestPairingCode(process.argv[2]);
@@ -58,7 +107,7 @@ class NekoEmit extends EventEmitter {
     Neko.ev.on("messages.upsert", async ({ messages }) => {
       for (const mess of messages) {
         this["from"] = mess.key.remoteJid;
-        
+
         if (
           mess?.message?.protocolMessage?.type !== 3 ||
           !mess?.messageStubType

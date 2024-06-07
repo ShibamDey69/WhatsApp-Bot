@@ -3,7 +3,7 @@ export default {
   aliases: ["status"],
   description: "Get the status of the ",
   usage: "status",
-  category: "Converter",
+  category: "converter",
   cooldown: 5,
   isMod: false,
   isPro: false,
