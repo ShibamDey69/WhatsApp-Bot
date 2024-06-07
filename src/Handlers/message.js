@@ -109,7 +109,7 @@ const messageHandler = async (Neko, m) => {
           m.message?.conversation ||
           m.message?.[messageType]?.text ||
           m.message?.[messageType]?.caption ||
-          Neko.prefix + m.message?.[messageType]?.selectedId ||
+          m.message?.[messageType]?.selectedId ? Neko.prefix + m.message?.[messageType]?.selectedId:null ||
           messageType ||
           "";
         const isCmd = text.toString().startsWith(Neko.prefix);
