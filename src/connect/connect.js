@@ -267,7 +267,7 @@ class NekoEmit extends EventEmitter {
       { quoted: m },
     );
   };
-  sendButton = async (from, button, m) => {
+  sendButton = async (from,text, button = [], m) => {
     let msg = generateWAMessageFromContent(
       from,
       {
