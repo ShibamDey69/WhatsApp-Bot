@@ -267,7 +267,51 @@ class NekoEmit extends EventEmitter {
       { quoted: m },
     );
   };
+  sendButton = async (from, button, m) => {
+    let msg = generateWAMessageFromContent(
+      from,
+      {
+        viewOnceMessage: {
+          message: {
+            messageContextInfo: {
+              deviceListMetadata: {},
+              deviceListMetadataVersion: 2,
+            },
+            interactiveMessage: proto.Message.InteractiveMessage.create({
+              body: proto.Message.InteractiveMessage.Body.create({
+                text,
+              }),
+              footer: proto.Message.InteractiveMessage.Footer.create({
+                text: `© ${META_DATA.BotName} 2024`,
+              }),
+              header: proto.Message.InteractiveMessage.Header.create({
+                title: "",
+                subtitle: "Cat is Love",
+                hasMediaAttachment: false,
+              }),
+              nativeFlowMessage:
+                proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                  buttons: [
+                    ...button,
+                  ],
+                }),
+            }),
+          },
+        },
+      },
+      {},
+    );
 
+    await this.relayMessage(
+      from,
+      msg.message,
+      {
+        messageId: msg.key.id,
+      },
+      { quoted: m },
+    );
+  };
+  
   downloadMediaContent = async (Neko, M) => {
     try {
       const stream = await downloadMediaMessage(
