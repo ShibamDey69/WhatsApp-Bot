@@ -105,13 +105,15 @@ const messageHandler = async (Neko, m) => {
 
       const parseMessage = (Neko, m, getContentType) => {
         const messageType = getContentType(m.message);
+        
         const text =
           m.message?.conversation ||
           m.message?.[messageType]?.text ||
           m.message?.[messageType]?.caption ||
-          m.message?.[messageType]?.selectedId ? Neko.prefix + m.message?.[messageType]?.selectedId:null ||
+          (m.message?.[messageType]?.selectedId ? Neko.prefix + m.message?.[messageType]?.selectedId:null) ||
           messageType ||
           "";
+        console.log(text);
         const isCmd = text.toString().startsWith(Neko.prefix);
         const from = m.key.remoteJid;
         const isGroup = from?.endsWith("@g.us");
