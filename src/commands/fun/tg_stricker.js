@@ -108,14 +108,12 @@ export default {
         let sticker_data = new Sticker(buffer, {
           pack: "Shibam",
           author: "Neko-MD",
-          type: StickerTypes.FULL,
           categories: ["🤩", "🎉"],
-          id: "12345",
           quality: 15,
           background: "transparent",
         });
 
-        await Neko.sendStrickerMessage(M.sender, await sticker_data.build(), M);
+        await Neko.sendStrickerMessage(M.sender, await sticker_data.toBuffer(), M);
       }
     } catch (error) {
       console.log(error);
