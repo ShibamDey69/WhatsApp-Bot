@@ -153,8 +153,8 @@ class NekoEmit extends EventEmitter {
 
   log = (type, text, text2) => Log(type, text, text2, this);
 
-  sendStrickerMessage = async (from, data, m) => {
-    return await this.sendMessage(from, { sticker: data }, { quoted: m });
+  sendStickerMessage = async (from, data, m) => {
+    return await this.sendMessage(from, { sticker: data}, { quoted: m });
   };
 
   sendTextMessage = async (from, text, m) => {

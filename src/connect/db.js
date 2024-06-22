@@ -67,7 +67,7 @@ class UserDbFunc {
     }
   }
 
-  async setPremium(Sender, state = true) {
+  async setPro(Sender, state = true) {
     try {
       if (!Sender.endsWith("@g.us")) {
         let sender = Sender.replace("@s.whatsapp.net", "");

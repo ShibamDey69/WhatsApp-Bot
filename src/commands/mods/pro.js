@@ -37,7 +37,7 @@ export default {
       }
 
       // Update the user's pro status
-      await Neko.user_db.setMod(userId, isPro);
+      await Neko.user_db.setPro(userId, isPro);
       let action = isPro ? "promoted to" : "demoted from";
       return Neko.sendMentionMessage(
         M.from,
