@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Sticker, StickerTypes } from "wa-sticker-formatter"; // ES6
+import { Sticker, StickerTypes } from "@shibam/sticker-maker"; // ES6
 
 class TelegramScraper {
   constructor(opt) {
@@ -108,9 +108,8 @@ export default {
         let sticker_data = new Sticker(buffer, {
           pack: "Shibam",
           author: "Neko-MD",
-          categories: ["🤩", "🎉"],
-          quality: 15,
-          background: "transparent",
+          category: ["🤩", "🎉"],
+          quality: 7,
         });
 
         await Neko.sendStrickerMessage(M.sender, await sticker_data.toBuffer(), M);

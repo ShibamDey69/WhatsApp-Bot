@@ -64,9 +64,9 @@ const sequilizer = async (Neko, m) => {
             groupMeta = null;
             admins = [];
         }
-        const ownerNumber = META_DATA.ownerNumber;
+        const ownerNumber = META_DATA.ownerNumber.map((v) => `${v}@s.whatsapp.net`)
         const modsList = [
-            ...ownerNumber.map((v) => `${v}@s.whatsapp.net`),
+            ...ownerNumber,
             ...mods,
         ];
         const mUpdated = {
@@ -81,7 +81,7 @@ const sequilizer = async (Neko, m) => {
             groupOwner: groupMeta?.owner,
             admins,
             isAdmin: isGroup ? admins.includes(sender) : false,
-            isOwner: ownerNumber.includes(sender?.split("@")[0]),
+            isOwner: ownerNumber.includes(sender),
             cmdName: text
                 ?.slice(META_DATA.prefix.length)
                 .trim()

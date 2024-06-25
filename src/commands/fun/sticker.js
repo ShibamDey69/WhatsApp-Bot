@@ -51,9 +51,9 @@ export default {
         let sticker = new Sticker(buffer.data, {
           pack: "Shibam",
           author: "Neko-MD",
-          quality: 30,
-          type: buffer.ext === "mp4" ? StickerTypes.CIRCLE : "",
-          background: "red",
+          category: ["🤩", "🎉"],
+          quality: 7,
+          type: StickerTypes.DEFAULT
         });
         let buff = await sticker.toBuffer();
         await Neko.sendStickerMessage(M.from, buff, M);
