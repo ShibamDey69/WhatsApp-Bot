@@ -103,18 +103,18 @@ const getErrorMessage = (sender, receiver) => {
   if (sender.partner === receiver.user_id)
     return {text:`*@${sender.user_id.split("@")[0]}* is already married to *@${receiver.user_id.split("@")[0]}*`,
             mention:[sender.user_id,receiver.user_id]};
-  if (sender.user_id === receiver.user_id)
+  else if (sender.user_id === receiver.user_id)
     return {text:`*@${sender.user_id.split("@")[0]}* can't marry himself...`,
            mention:[sender.user_id]};
-  if (sender.isMarried)
+  else if (sender.isMarried)
     return {text:`You are already married to *@${sender.partner.split("@")[0]}*... don't be a cheater 😕 baka..!`,
             mention:[sender.partner]};
-  if (receiver.isMarried)
+  else if (receiver.isMarried)
     return {text:`Sorry You are quite late😔 *@${receiver.user_id.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
             mention:[receiver.user_id,receiver.partner]};
-  if (sender?.proposal?.includes(receiver.user_id))
+  else if (sender?.proposal?.includes(receiver.user_id))
     return {text:`*@${sender.user_id.split("@")[0]}* has already sent a marriage proposal to *@${receiver.user_id.split("@")[0]}*`,
             mention:[sender.user_id,receiver.user_id]};
-  return {text:"No marriage request found from this user.",
+  else return {text:"No marriage request found from this user.",
           mentions:[sender.user_id]};
 };
