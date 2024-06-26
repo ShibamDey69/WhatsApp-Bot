@@ -155,7 +155,7 @@ const messageHandler = async (Neko, m) => {
           if (gc_link) {
             const M = await sequilizer(Neko, m);
             if (!M?.isAdmin && !M?.isMod) {
-              if (M?.isBotAdmin) {
+              if (!M?.isBotAdmin) {
                 await Neko.sendTextMessage(
                   M.from,
                   "This Group has Antilink enabled. Admin access needed for bot to work.",
@@ -266,7 +266,7 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendReactMessage(M.from, "♥️", M);
           if (Neko?.commands?.has(M?.cmdName)) {
             const cmd = Neko?.commands.get(M?.cmdName);
-            if (!M?.isGroup && !M?.isMod && !M?.isPro) {
+            if (!M?.isGroup && (!M?.isMod || !M?.isPro)) {
               await Neko.sendReactMessage(M.from, "❌", M);
               await Neko.sendTextMessage(
                 M.from,
@@ -296,7 +296,7 @@ const messageHandler = async (Neko, m) => {
               return true;
             }
 
-            if (cmd?.isAdmin && !M?.isAdmin && !M.isMod) {
+            if (cmd?.isAdmin && (!M?.isAdmin || !M.isMod)) {
               await Neko.sendReactMessage(M.from, "❌", M);
               await Neko.sendTextMessage(
                 M.from,

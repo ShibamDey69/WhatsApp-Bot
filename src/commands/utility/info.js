@@ -4,7 +4,7 @@ export default {
   desc: "Get information about a command",
   category: "Utility",
   usage: `info <command name>`,
-  react: "📝",
+  cooldown: 1,
   isAdmin: false,
   isGroup: false,
   isBotAdmin: false,
@@ -34,7 +34,7 @@ export default {
       let cmdUsage = cmdData?.usage || "No Usage";
       let cmdName1 = cmdData?.name || "No Name";
       let cmdCategory = cmdData?.category || "No Category";
-      let cmdAlias = cmdData?.alias || "No Alias";
+      let cmdAlias = cmdData?.aliases || "No Alias";
       return await Neko.sendTextMessage(
         M.from,
         `*${cmdName}* - ${cmdDesc}\n*Name:* ${cmdName1}\n*Usage:* ${cmdUsage}\n*Category:* ${cmdCategory}\n*Alias:* ${cmdAlias}`,M)

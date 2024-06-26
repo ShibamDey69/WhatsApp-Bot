@@ -53,7 +53,7 @@ const tele = new TelegramScraper({
 });
 export default {
   name: "tg_sticker",
-  alias: ["ts", "tgsticker", "tgsticker"],
+  aliases: ["ts", "tgsticker", "tgsticker"],
   desc: "Converts a text to sticker",
   category: "fun",
   usage: `tg_sticker <text>`,
@@ -112,7 +112,7 @@ export default {
           quality: 7,
         });
 
-        await Neko.sendStrickerMessage(M.sender, await sticker_data.toBuffer(), M);
+        await Neko.sendStickerMessage(M.sender, await sticker_data.toBuffer(), M);
       }
     } catch (error) {
       console.log(error);

@@ -50,7 +50,7 @@ const sequilizer = async (Neko, m) => {
         );
         const isMe = m.key?.fromMe;
         const sender = isMe
-            ? `${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`
+            ? `${Neko.user?.id?.split(":")[0]}@s.whatsapp.net`
             : isGroup
               ? m.key?.participant
               : from;
@@ -65,10 +65,10 @@ const sequilizer = async (Neko, m) => {
             admins = [];
         }
         const ownerNumber = META_DATA.ownerNumber.map((v) => `${v}@s.whatsapp.net`)
-        const modsList = [
+        const modsList = new Set([
             ...ownerNumber,
             ...mods,
-        ];
+        ]);
         const mUpdated = {
             ...m,
             messageType,
@@ -112,7 +112,7 @@ const sequilizer = async (Neko, m) => {
             ),
             isBotAdmin: isGroup
                 ? admins.includes(
-                      `${Neko.user.id.split(":")[0]}@s.whatsapp.net`,
+                      `${Neko.user?.id.split(":")[0]}@s.whatsapp.net`,
                   )
                 : false,
             isMod: modsList.includes(sender),
