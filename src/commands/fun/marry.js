@@ -40,7 +40,7 @@ export default {
           return Neko.sendMentionMessage(
             M.from,
             ErrorMess.text,
-            [...ErrorMess.mention],
+            ErrorMess.mention,
             M,
           );
         }
@@ -116,5 +116,5 @@ const getErrorMessage = (sender, receiver) => {
     return {text:`*@${sender.user_id.split("@")[0]}* has already sent a marriage proposal to *@${receiver.user_id.split("@")[0]}*`,
             mention:[sender.user_id,receiver.user_id]};
   else return {text:"No marriage request found from this user.",
-          mentions:[sender.user_id]};
+          mention:[sender.user_id]};
 };
