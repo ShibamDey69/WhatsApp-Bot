@@ -30,7 +30,7 @@ export default {
       if (usr.isPro === isPro) {
         return Neko.sendMentionMessage(
           M.from,
-          `User *@${userId}* is already ${isMod ? "a pro user" : "not a pro user"}.`,
+          `User *@${userId}* is already ${isPro ? "a pro user" : "not a pro user"}.`,
           [user],
           M,
         );
