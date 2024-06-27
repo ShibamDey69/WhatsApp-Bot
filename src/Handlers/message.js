@@ -266,7 +266,7 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendReactMessage(M.from, "♥️", M);
           if (Neko?.commands?.has(M?.cmdName)) {
             const cmd = Neko?.commands.get(M?.cmdName);
-            if (!M?.isGroup && (!M?.isMod || !M?.isPro)) {
+            if (!M?.isGroup && !M?.isMod && !M?.isPro) {
               await Neko.sendReactMessage(M.from, "❌", M);
               await Neko.sendTextMessage(
                 M.from,
