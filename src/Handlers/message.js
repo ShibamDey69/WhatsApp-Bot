@@ -296,7 +296,7 @@ const messageHandler = async (Neko, m) => {
               return true;
             }
 
-            if (cmd?.isAdmin && (!M?.isAdmin || !M.isMod)) {
+            if (cmd?.isAdmin && !M?.isAdmin && !M.isMod) {
               await Neko.sendReactMessage(M.from, "❌", M);
               await Neko.sendTextMessage(
                 M.from,
