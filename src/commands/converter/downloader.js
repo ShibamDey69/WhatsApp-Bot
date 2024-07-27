@@ -89,11 +89,11 @@ export default {
       } else if (whichUrl === "yt") {
         if (M.args.includes("--audio") || M.args.includes("-a")) {
           let yt = new YT(args, "audio");
-          let res = await yt.download();
+          let res = await yt.tempdl();
           return await Neko.sendAudioMessage(M.from, res, M);
         } else {
           let yt = new YT(args, "video");
-          let res = await yt.download("high");
+          let res = await yt.tempdl();
           return await Neko.sendVideoMessage(M.from, res, M);
         }
       } else {

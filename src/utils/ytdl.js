@@ -5,6 +5,8 @@ import { tmpdir } from 'os';
 import { createWriteStream } from 'fs';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import axios from "axios";
+import qs from "qs"; 
 
 const execPromise = promisify(exec);
 
@@ -53,6 +55,7 @@ export default class YTDL {
         await Promise.all([unlink(videoFilename), unlink(audioFilename), unlink(filename)]);
         return buffer;
         } catch(error) {
+            console.log(error);
             throw Error(error);
         }
     }
@@ -65,4 +68,39 @@ export default class YTDL {
       stream.on("error", (err) => reject(err));
     });
   };
+
+    tempdl =  async () => {
+  try {
+    
+    const form = {
+      k_query: this.url,
+      k_page: "home",
+      hl: "en",
+      q_auto: 0,
+    };
+
+     let response = await axios.post(
+      "https://in-y2mate.com/mates/analyzeV2/ajax",
+      qs.stringify(form),
+    );
+    let links = response.data.links;
+    let linkToken = this.type === "audio" ? links.mp3.mp3128.k : links.mp4.auto.k;
+    let vid = response.data.vid;
+
+    const res = await axios.post(
+      "https://in-y2mate.com/mates/convertV2/index",
+      qs.stringify({
+        vid,
+        k: linkToken,
+      }),
+    );
+    let {data } = await axios.get(res.data.dlink, {
+      responseType: "arraybuffer",
+    })
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+    
 }
