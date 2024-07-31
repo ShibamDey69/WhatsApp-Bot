@@ -1,7 +1,7 @@
 
 export default {
   name: "retrieve",
-  alias: ["rv"],
+  aliases: ["rv"],
   description: "Retreive a user's profile",
   category: "fun",
   usage: "retreive @tag",

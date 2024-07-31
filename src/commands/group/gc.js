@@ -3,7 +3,7 @@ import os from "os";
 
 export default {
   name: "gc",
-  alias: ["gc"],
+  aliases: ["gc"],
   category: "group",
   description: "Manage group chats",
   usage:

@@ -3,7 +3,7 @@ import YT from "../../utils/ytdl.js";
 
 export default {
   name: "play",
-  alias: ["p"],
+  aliases: ["p"],
   desc: "Play music from youtube",
   category: "converter",
   usage: `play <song name>`,

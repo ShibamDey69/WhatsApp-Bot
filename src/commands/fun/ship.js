@@ -1,6 +1,6 @@
 export default {
   name: "ship",
-  alias: ["ship"],
+  aliases: ["ship"],
   desc: "Ship two users",
   category: "fun",
   usage: `ship @tag | ship @tag1 @tag2`,

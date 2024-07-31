@@ -38,8 +38,8 @@ export default {
         );
       }
       const [imageUrl] = await Promise.all([
-        hercai.betaDrawImage({
-          prompt: prompt,
+        hercai.drawImage({
+          prompt,
           negative_prompt: negPrompt ?? "no blur,no blood",
           sampler: "DPM-Solver" /* Default => DPM-Solver */,
           image_style: imgStyle /* Default => Null */,

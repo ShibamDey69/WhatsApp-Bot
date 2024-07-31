@@ -1,6 +1,6 @@
 export default {
   name: "ping",
-  alias: ["tagall","tag"],
+  aliases: ["tagall","tag"],
   desc: "Check the bot's ping",
   category: "group",
   usage: `ping <Message>`,

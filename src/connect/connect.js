@@ -83,7 +83,6 @@ class NekoEmit extends EventEmitter {
           const msg = await store.loadMessage(key.remoteJid, key.id);
           return msg.message || undefined;
         }
-        console.log("store is undefined");
         return {
           conversation: "An error occurred while trying to fetch the message.",
         };
@@ -193,7 +192,7 @@ class NekoEmit extends EventEmitter {
       from,
       {
         audio: typeof url === "string" ? { url } : url,
-        mimetype: "audio/mp4",
+        mimetype: "audio/mpeg",
         ptt: ppt ?? false,
       },
       { quoted: m },
