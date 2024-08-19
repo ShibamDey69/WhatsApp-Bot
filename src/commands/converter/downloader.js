@@ -58,7 +58,7 @@ export default {
 
       if (whichUrl === "insta") {
         const data = await insta(args);
-        if (data?.url_list.length === 0) {
+        if (!data.url_list?.length) {
           return await Neko.sendTextMessage(
             M.from,
             "Failed to download media from the provided URL.",
@@ -89,11 +89,11 @@ export default {
       } else if (whichUrl === "yt") {
         if (M.args.includes("--audio") || M.args.includes("-a")) {
           let yt = new YT(args, "audio");
-          let res = await yt.tempdl();
+          let res = await yt.download();
           return await Neko.sendAudioMessage(M.from, res, M);
         } else {
           let yt = new YT(args, "video");
-          let res = await yt.tempdl();
+          let res = await yt.download();
           return await Neko.sendVideoMessage(M.from, res, M);
         }
       } else {

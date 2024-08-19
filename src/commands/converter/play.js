@@ -42,11 +42,11 @@ export default {
       
       if (M.args.includes("--video") || M.args.includes("-v")) {
         let yt = new YT(url, "video");
-        let res = await yt.tempdl();
+        let res = await yt.download();
         return await Neko.sendVideoMessage(M.from, res, M);
       } else {
         let yt = new YT(url, "audio");
-        let res = await yt.tempdl();
+        let res = await yt.download();
         return await Neko.sendAudioMessage(M.from, res, M);
       }
     } catch (error) {
