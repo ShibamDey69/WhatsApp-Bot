@@ -21,7 +21,7 @@
     "dotenv": "^16.4.5",
     "events": "^3.3.0",
     "figlet": "^1.7.0",
-    "file-type": "^19.0.0",
+    "file-type": "^19.1.0",
     "form-data": "^4.0.0",
     "hercai": "^12.2.0",
     "instagram-url-direct": "^1.0.17",
