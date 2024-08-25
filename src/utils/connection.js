@@ -4,7 +4,7 @@ import clc from "cli-color";
 import figlet from "figlet";
 let tryConnect = 0;
 
-async function Connection(update, This, version, isLatest, clearState) {
+async function Connection(update, This, clearState) {
   const { lastDisconnect, connection } = update;
   if (connection === "connecting") {
     tryConnect++;
@@ -45,8 +45,6 @@ async function Connection(update, This, version, isLatest, clearState) {
       case DisconnectReason.timedOut:
         This.log("status", `${reason}`, "Timed Out! Reconnecting...");
         await clearState();
-        process.exit(0);
-
         break;
       case DisconnectReason.loggedOut:
         This.log(
@@ -55,8 +53,6 @@ async function Connection(update, This, version, isLatest, clearState) {
           "Session has been Logged Out! Please re-scan QR!",
         );
         await clearState();
-        process.exit(0);
-
         break;
       case DisconnectReason.multideviceMismatch:
         if (tryConnect < 2) {
@@ -121,13 +117,8 @@ async function Connection(update, This, version, isLatest, clearState) {
       `Name    : ${This?.user?.name !== undefined ? This?.user?.name : "Neko"}`,
     );
     This.log("connect", `Number  : ${This?.user?.id?.split(":")[0]}`);
-    This.log("connect", `Version : v6.7.2`);
-    This.log(
-      "connect",
-      `WA Web Version : v${version.toString()?.split(",")?.join(".")}`,
-    );
-    This.log("connect", `Latest  : ${isLatest ? "YES" : "NO"}\n\n`);
-    
+    This.log("connect", `Version : v6.7.7`);
+    This.log("connect", `Time : ${new Date().toLocaleString("id", { timeZone: "Asia/Kolkata" })}`);
     This.log("info","Neko is connected!");
     if(This.commands) {
       This.log("info","Commands are loaded!");

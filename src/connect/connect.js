@@ -1,12 +1,9 @@
 import {
   makeWASocket,
-  fetchLatestWaWebVersion,
+  useMultiFileAuthState,
   downloadMediaMessage,
   generateWAMessageFromContent,
-  makeInMemoryStore,
-  makeCacheableSignalKeyStore,
 } from "@whiskeysockets/baileys";
-import NodeCache from "node-cache";
 import fs from "fs";
 import Pino from "pino";
 import EventEmitter from "events";
@@ -14,7 +11,6 @@ import { fileTypeFromBuffer } from "file-type";
 import Connection from "../utils/connection.js";
 import loadCommands from "../utils/commands.js";
 import Log from "../utils/logs.js";
-import Authentication from "../connect/auth.js";
 import pkg from "@whiskeysockets/baileys";
 const { proto } = pkg;
 const META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
@@ -22,14 +18,6 @@ const loggerOptions = { level: "silent" };
 const logger = Pino(loggerOptions).child({
   level: "silent",
 });
-const msgRetryCounterCache = new NodeCache();
-const store = makeInMemoryStore({ logger });
-
-store?.readFromFile("./src/tmp/baileys_store_multi.json");
-// save every 10s
-setInterval(() => {
-  store?.writeToFile("./src/tmp/baileys_store_multi.json");
-}, 10_000);
 
 class NekoEmit extends EventEmitter {
   constructor(config) {
@@ -39,57 +27,26 @@ class NekoEmit extends EventEmitter {
     this.logger = logger;
   }
   async connect() {
-    const SingleAuth = new Authentication(`${this.socketConfig.session}`);
-    const { saveCreds, clearState, state } = await SingleAuth.singleFileAuth();
-
-    const { version, isLatest } = await fetchLatestWaWebVersion({});
+    if (!fs.existsSync("Auth-Info")) {
+      await fs.promises.mkdir("Auth-Info");
+    }
+    const clearState = async () => {
+      await fs.promises.rm(`./Auth-Info/${this.socketConfig.session}`, {
+        recursive: true,
+      });
+      process.exit(0);
+    };
+    const { saveCreds, state } = await useMultiFileAuthState(
+      `./Auth-Info/${this.socketConfig.session}`,
+    );
     const Neko = makeWASocket({
       ...this.socketConfig,
       logger,
-      auth: {
-        creds: state.creds,
-        keys: makeCacheableSignalKeyStore(state.keys, logger),
-      },
-      msgRetryCounterCache,
+      auth: state,
       browser: ["Ubuntu", "Chrome", "20.0.04"],
-      version,
-      shouldSyncHistoryMessage: true,
       printQRInTerminal: false,
-      syncFullHistory: true,
-      generateHighQualityLinkPreview: true,
-      patchMessageBeforeSending: (message) => {
-        const requiresPatch = !!(
-          message.buttonsMessage ||
-          message.templateMessage ||
-          message.listMessage
-        );
-        if (requiresPatch) {
-          message = {
-            viewOnceMessage: {
-              message: {
-                messageContextInfo: {
-                  deviceListMetadataVersion: 2,
-                  deviceListMetadata: {},
-                },
-                ...message,
-              },
-            },
-          };
-        }
-        return message;
-      },
-      getMessage: async (key) => {
-        if (store) {
-          const msg = await store.loadMessage(key.remoteJid, key.id);
-          return msg.message || undefined;
-        }
-        return {
-          conversation: "An error occurred while trying to fetch the message.",
-        };
-      },
-      msgRetryCounterMap: 3,
     });
-    store?.bind(Neko.ev);
+
     if (!Neko.authState.creds.registered) {
       setTimeout(async () => {
         let code = await Neko.requestPairingCode(process.argv[2]);
@@ -98,7 +55,7 @@ class NekoEmit extends EventEmitter {
     }
 
     Neko.ev.on("connection.update", async (update) =>
-      Connection(update, this, version, isLatest, clearState),
+      Connection(update, this, clearState),
     );
 
     Neko.ev.on("creds.update", saveCreds);
@@ -153,7 +110,7 @@ class NekoEmit extends EventEmitter {
   log = (type, text, text2) => Log(type, text, text2, this);
 
   sendStickerMessage = async (from, data, m) => {
-    return await this.sendMessage(from, { sticker: data}, { quoted: m });
+    return await this.sendMessage(from, { sticker: data }, { quoted: m });
   };
 
   sendTextMessage = async (from, text, m) => {
@@ -266,7 +223,7 @@ class NekoEmit extends EventEmitter {
       { quoted: m },
     );
   };
-  sendButton = async (from,text, button = [], m) => {
+  sendButton = async (from, text, button = [], m) => {
     let msg = generateWAMessageFromContent(
       from,
       {
@@ -290,9 +247,7 @@ class NekoEmit extends EventEmitter {
               }),
               nativeFlowMessage:
                 proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                  buttons: [
-                    ...button,
-                  ],
+                  buttons: [...button],
                 }),
             }),
           },
@@ -310,7 +265,7 @@ class NekoEmit extends EventEmitter {
       { quoted: m },
     );
   };
-  
+
   downloadMediaContent = async (Neko, M) => {
     try {
       const stream = await downloadMediaMessage(
