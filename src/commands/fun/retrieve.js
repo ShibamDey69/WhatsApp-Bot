@@ -42,8 +42,7 @@ export default {
         );
       }
     } catch (error) {
-      console.log(error);
-      throw Error(error);
+      await Neko.error(error);
     }
   },
 };

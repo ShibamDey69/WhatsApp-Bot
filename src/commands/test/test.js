@@ -10,7 +10,7 @@ export default {
        }
        await Neko.sendTextMessage(M.from, "Test Command",M);
     } catch (error) {
-       throw new Error(error);
+       await Neko.error(error);
     }
   }
 }

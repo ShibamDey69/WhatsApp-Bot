@@ -39,8 +39,7 @@ export default {
         M.from,
         `*${cmdName}* - ${cmdDesc}\n*Name:* ${cmdName1}\n*Usage:* ${cmdUsage}\n*Category:* ${cmdCategory}\n*Alias:* ${cmdAlias}`,M)
     } catch (error) {
-      console.log(error);
-      throw Error(error);
+      await Neko.error(error);
     }
   } 
 }

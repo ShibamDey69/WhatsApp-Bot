@@ -100,8 +100,7 @@ export default {
         return await Neko.sendTextMessage(M.from, "*Inavlid Url Provided!*", M);
       }
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

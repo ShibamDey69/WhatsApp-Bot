@@ -25,8 +25,7 @@ export default {
         }*\n📧 *Tags:* ${hidden ? '*[HIDDEN]*' : `\n${participants.map((v) => '@' + v.split('@')[0]).join('\n')}`}`;
         return await Neko.sendMentionMessage(M.from, text,[...participants,M.sender], M);
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 }

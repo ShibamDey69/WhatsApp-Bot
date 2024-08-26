@@ -29,8 +29,7 @@ export default {
       await Neko.groupParticipantsUpdate(M?.from, [user], "remove");
      return await Neko.sendMentionMessage(M.from, `User @${user.split("@")[0]} has been removed from the group`,[user],M);
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   }
 }

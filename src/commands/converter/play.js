@@ -50,8 +50,7 @@ export default {
         return await Neko.sendAudioMessage(M.from, res, M);
       }
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

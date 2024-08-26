@@ -58,8 +58,7 @@ export default {
       }
       await Neko.sendImageMessage(M.from, imageUrl.url, M);
     } catch (error) {
-      console.error(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

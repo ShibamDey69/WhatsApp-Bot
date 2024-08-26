@@ -40,8 +40,7 @@ export default {
       // Send the menu text as a message
       await Neko.sendMentionMessage(M.from, text, [M.sender],M);
     } catch (error) {
-      console.error(error);
-      throw new Error("An error occurred while displaying the menu.");
+      await Neko.error(error);
     }
   },
 };

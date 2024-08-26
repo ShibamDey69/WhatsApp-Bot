@@ -9,93 +9,10 @@ import DB from "../connect/db.js";
 const gc_db = new DB.GroupDbFunc();
 const user_db = new DB.UserDbFunc();
 
-class Queue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-    this.filePath = "src/tmp/queueData.json";
-  }
 
-  async initialize() {
-    try {
-      const data = await fs.readFile(this.filePath, "utf8").catch(() => "[]");
-      this.queue = JSON.parse(data);
-    } catch {
-      await this.saveQueueToFile();
-    }
-  }
-
-  async saveQueueToFile() {
-    try {
-      await fs.writeFile(this.filePath, JSON.stringify(this.queue), "utf8");
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async enqueue(funcString, ...args) {
-    try {
-      this.queue.push({ funcString, args });
-      await this.saveQueueToFile();
-      if (!this.processing) await this.processQueue();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async processQueue() {
-    this.processing = true;
-    while (this.queue.length > 0) {
-      const { funcString, args } = this.queue.shift();
-      try {
-        const func = new Function(
-          "retry",
-          "sequilizer",
-          "cooldown",
-          "gc_db",
-          "user_db",
-          "getContentType",
-          "FormData",
-          "axios",
-          `return ${funcString}`,
-        )(
-          retry,
-          sequilizer,
-          cooldown,
-          gc_db,
-          user_db,
-          getContentType,
-          FormData,
-          axios,
-        );
-        await func(...args);
-        await this.saveQueueToFile();
-      } catch (error) {
-        this.queue.unshift({ funcString, args });
-        await this.saveQueueToFile();
-      }
-    }
-    this.processing = false;
-  }
-}
-
-const messageQueue = new Queue();
-await messageQueue.initialize();
 
 const messageHandler = async (Neko, m) => {
   try {
-    const processMessage = async (
-      Neko,
-      m,
-      retry,
-      sequilizer,
-      cooldown,
-      gc_db,
-      user_db,
-      getContentType,
-      FormData,
-      axios,
-    ) => {
       const operation = retry.operation({
         retries: 2,
         factor: 2,
@@ -113,7 +30,6 @@ const messageHandler = async (Neko, m) => {
           (m.message?.[messageType]?.selectedId ? Neko.prefix + m.message?.[messageType]?.selectedId:null) ||
           messageType ||
           "";
-        console.log(text);
         const isCmd = text.toString().startsWith(Neko.prefix);
         const from = m.key.remoteJid;
         const isGroup = from?.endsWith("@g.us");
@@ -263,9 +179,10 @@ const messageHandler = async (Neko, m) => {
             return true;
           }
 
-          await Neko.sendReactMessage(M.from, "♥️", M);
+          
           if (Neko?.commands?.has(M?.cmdName)) {
             const cmd = Neko?.commands.get(M?.cmdName);
+            await Neko.sendReactMessage(M.from, "♥️", M);
             if (!M?.isGroup && !M?.isMod && !M?.isPro) {
               await Neko.sendReactMessage(M.from, "❌", M);
               await Neko.sendTextMessage(
@@ -348,31 +265,18 @@ const messageHandler = async (Neko, m) => {
       const handleErrors = async (
         error,
         operation,
-        currentAttempt,
         Neko,
-        m,
         from,
+        M
       ) => {
-        if (error.data?.status === 429) {
-          const retryAfter =
-            error.data?.headers?.["retry-after"] * 1000 || 30000;
-          if (retryAfter) {
-            await new Promise((resolve) => setTimeout(resolve, retryAfter));
-          }
-        }
-        if (error.data?.status === 403) return;
-        if (currentAttempt < 3 && operation.retry(error)) {
-          Neko.log("error", `Attempt ${currentAttempt} failed. Retrying...`);
-          if (currentAttempt === 2) {
-            await Neko.sendReactMessage(from, "❌", m);
-            console.log(error);
-            Neko.log("error", `Maximum Retry Attempts Reached`);
-            return;
-          }
+        if(!operation.retry(error)) {
+          await Neko.sendReactMessage(from, "❌", M);
+          await Neko.sendTextMessage(from, `An error occurred while processing your request. Please try again later. ${error}`, M);
+          return true;
         }
       };
 
-      await operation.attempt(async (currentAttempt) => {
+      operation.attempt(async () => {
         const [messageType, text, isCmd, from, isGroup, sender] = parseMessage(
           Neko,
           m,
@@ -386,7 +290,7 @@ const messageHandler = async (Neko, m) => {
           } else if (!isGroup && text) {
             Neko.log("message", `${m.pushName || "Bot"} | ${text}`, "PRIVATE");
           }
-          if (
+         if (
             isGroup &&
             (await handleGroup(
               Neko,
@@ -408,23 +312,9 @@ const messageHandler = async (Neko, m) => {
           )
             return;
         } catch (error) {
-          await handleErrors(error, operation, currentAttempt, Neko, m, from);
+          await handleErrors(error, operation, Neko,from,m);
         }
       });
-    };
-    messageQueue.enqueue(
-      processMessage.toString(),
-      Neko,
-      m,
-      retry,
-      sequilizer,
-      cooldown,
-      gc_db,
-      user_db,
-      getContentType,
-      FormData,
-      axios,
-    );
   } catch (error) {
     console.error(error);
   }

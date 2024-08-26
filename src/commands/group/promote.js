@@ -25,7 +25,7 @@ export default {
        await Neko.groupParticipantsUpdate(M.from, [user], "promote");
        await Neko.sendMentionMessage(M.from, `User @${user.split("@")[0]} has been promoted to admin`,[user],M)
     } catch (error) {
-       throw new Error(error);
+       await Neko.error(error);
     }
   }
 }

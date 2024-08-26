@@ -30,7 +30,7 @@ export default {
         M,
       );
     } catch (error) {
-      console.log(error);
+      await Neko.error(error);
     }
   },
 };

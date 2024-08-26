@@ -82,7 +82,7 @@ export default {
           break;
       }
     } catch (error) {
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

@@ -29,7 +29,7 @@ export default {
      await Neko.groupParticipantsUpdate(M?.from, [user], "demote");
       await Neko.sendMentionMessage(M.from, `User @${user.split("@")[0]} has been demoted to member`,[user],M)
     } catch (error) {
-      throw new Error(error);
+      await Neko.error(error);
     }
   }
 }

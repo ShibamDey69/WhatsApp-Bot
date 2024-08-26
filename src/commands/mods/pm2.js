@@ -19,7 +19,7 @@ export default {
       await asyncExec(`pm2 ${M.args}`);
       return await Neko.sendTextMessage(M.from, "*Command Executed...*",M);
     } catch (error) {
-      return await Neko.sendTextMessage(M.from, `*Error* ${error}`,M);
+      await Neko.error(error)
     }
   },
 }

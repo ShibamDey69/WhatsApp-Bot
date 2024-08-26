@@ -79,10 +79,9 @@ export default {
         audio,
         M
       );
-      return;
+      
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error)
     }
   },
 };

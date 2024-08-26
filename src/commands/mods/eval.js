@@ -37,11 +37,7 @@ export default {
         );
       }
     } catch (error) {
-      return await Neko.sendTextMessage(
-        M.from,
-        `*Error:* ${error.message}`,
-        M,
-      );
+      await Neko.error(error);
     }
   }
 }

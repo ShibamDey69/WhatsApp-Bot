@@ -36,8 +36,7 @@ export default {
       }
       return await Neko.sendTextMessage(M.from, `*${res.reply}*`, M);
     } catch (error) {
-      console.error(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

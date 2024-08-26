@@ -26,8 +26,7 @@ export default {
       const shipText = `💖 *${ship}%* 💖\n*@${user.split("@")[0]} ❤️ @${user2.split("@")[0]}*`;
       await Neko.sendMentionMessage(M.from, shipText,[user,user2] ,M);
     } catch (error) {
-      console.log(error);
-      throw Error(error);
+      await Neko.error(error);
     }
   } 
 }

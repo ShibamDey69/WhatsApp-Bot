@@ -50,7 +50,7 @@ export default {
         }
       }
     } catch (error) {
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

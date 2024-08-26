@@ -53,14 +53,14 @@ export default {
           author: "Neko-MD",
           category: ["🤩", "🎉"],
           quality: 7,
-          type: StickerTypes.DEFAULT
+          type: StickerTypes.DEFAULT,
+          text: M.args
         });
         let buff = await sticker.toBuffer();
         await Neko.sendStickerMessage(M.from, buff, M);
       }
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };

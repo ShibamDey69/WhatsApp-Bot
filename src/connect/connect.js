@@ -62,8 +62,8 @@ class NekoEmit extends EventEmitter {
 
     Neko.ev.on("messages.upsert", async ({ messages }) => {
       for (const mess of messages) {
-        this["from"] = mess.key.remoteJid;
-
+        this.from = mess.key.remoteJid;
+        this.mess = mess;
         if (
           mess?.message?.protocolMessage?.type !== 3 ||
           !mess?.messageStubType
@@ -288,8 +288,6 @@ class NekoEmit extends EventEmitter {
   };
 
   error = async (err) => {
-    this.log("error", err);
-    console.log(err);
     throw new Error(err);
   };
 }

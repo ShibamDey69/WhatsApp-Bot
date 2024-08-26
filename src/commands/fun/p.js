@@ -36,8 +36,7 @@ export default {
         return await Neko.sendVideoMessage(M.from, res, M);
       
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      Neko.error(error);
     }
   },
 };

@@ -115,8 +115,7 @@ export default {
         await Neko.sendStickerMessage(M.sender, await sticker_data.toBuffer(), M);
       }
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      await Neko.error(error);
     }
   },
 };
