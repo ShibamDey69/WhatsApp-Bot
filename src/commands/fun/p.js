@@ -18,7 +18,7 @@ export default {
       if (!M.args) {
         return await Neko.sendTextMessage(
           M.from,
-          "Please provide a song name.",
+          "Please provide a query",
           M,
         );
       }
