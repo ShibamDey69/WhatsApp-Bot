@@ -16,12 +16,20 @@ export default {
       // Determine the user to be modified and the new pro status
       let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
       if (!user) {
-        return Neko.sendTextMessage(M.from, "Please mention or quote a user to modify their pro status.", M);
+        return Neko.sendTextMessage(
+          M.from,
+          "Please mention or quote a user to modify their pro status.",
+          M,
+        );
       }
 
-      let status = M.text.split('--')[1]?.trim();
+      let status = M.text.split("--")[1]?.trim();
       if (status !== "true" && status !== "false") {
-        return Neko.sendTextMessage(M.from, "Please specify the status as --true or --false.", M);
+        return Neko.sendTextMessage(
+          M.from,
+          "Please specify the status as --true or --false.",
+          M,
+        );
       }
 
       let isPro = status === "true";

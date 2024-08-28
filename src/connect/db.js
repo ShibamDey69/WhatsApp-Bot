@@ -215,7 +215,9 @@ class GroupDbFunc {
   async filterGroup(key, value) {
     try {
       let groups = JSON.parse(fs.readFileSync(groupFilePath));
-      let filter = Object.values(groups).filter((group) => group[key] === value);
+      let filter = Object.values(groups).filter(
+        (group) => group[key] === value,
+      );
       return filter;
     } catch (error) {
       console.log(error);

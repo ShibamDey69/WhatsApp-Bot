@@ -20,9 +20,13 @@ export default {
         let gc = await Neko.gc_db.getGroup(M.from);
         let usr = user ? await Neko.user_db.getUser(user) : null;
 
-        // Check if the group is already banned 
+        // Check if the group is already banned
         if (gc.isBanned) {
-          return Neko.sendTextMessage(M.from, `This group *${M.groupMeta.subject}* is already banned from using this bot.`,M);
+          return Neko.sendTextMessage(
+            M.from,
+            `This group *${M.groupMeta.subject}* is already banned from using this bot.`,
+            M,
+          );
         }
 
         // Check if the mentioned user is already banned and if the sender is a mod
@@ -38,7 +42,11 @@ export default {
         // Ban the group if no user is mentioned or quoted
         if (!user) {
           await Neko.gc_db.setGcBanned(M.from, true);
-          return Neko.sendTextMessage(M.from, `This group *${M.groupMeta.subject}* has been banned.`,M);
+          return Neko.sendTextMessage(
+            M.from,
+            `This group *${M.groupMeta.subject}* has been banned.`,
+            M,
+          );
         }
 
         // Ban the mentioned or quoted user if they are not a mod
@@ -80,7 +88,11 @@ export default {
             );
           }
         } else {
-          return Neko.sendTextMessage(M.from, "Please mention or quote a user to ban.",M);
+          return Neko.sendTextMessage(
+            M.from,
+            "Please mention or quote a user to ban.",
+            M,
+          );
         }
       }
     } catch (error) {

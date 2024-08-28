@@ -74,14 +74,9 @@ export default {
           );
           break;
       }
-      return await Neko.sendAudioMessage(
-        M.from,
-        audio,
-        M
-      );
-      
+      return await Neko.sendAudioMessage(M.from, audio, M);
     } catch (error) {
-      await Neko.error(error)
+      await Neko.error(error);
     }
   },
 };

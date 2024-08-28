@@ -24,20 +24,12 @@ export default {
       const result = eval(code);
       if (typeof result === "object") {
         const json = JSON.stringify(result, null, 2);
-        return await Neko.sendTextMessage(
-          M.from,
-          `*Result:* ${json}`,
-          M,
-        );
+        return await Neko.sendTextMessage(M.from, `*Result:* ${json}`, M);
       } else {
-        return await Neko.sendTextMessage(
-          M.from,
-          `*Result:* ${result}`,
-          M,
-        );
+        return await Neko.sendTextMessage(M.from, `*Result:* ${result}`, M);
       }
     } catch (error) {
       await Neko.error(error);
     }
-  }
-}
+  },
+};

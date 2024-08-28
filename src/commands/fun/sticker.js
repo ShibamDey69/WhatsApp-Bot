@@ -54,7 +54,7 @@ export default {
           category: ["🤩", "🎉"],
           quality: 7,
           type: StickerTypes.DEFAULT,
-          text: M.args
+          text: M.args,
         });
         let buff = await sticker.toBuffer();
         await Neko.sendStickerMessage(M.from, buff, M);

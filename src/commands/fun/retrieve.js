@@ -1,4 +1,3 @@
-
 export default {
   name: "retrieve",
   aliases: ["rv"],

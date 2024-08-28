@@ -13,7 +13,6 @@ export default {
   isOwner: false,
   run: async (Neko, M) => {
     try {
-      
       if (M.args.length < 1) {
         return await Neko.sendTextMessage(
           M.from,
@@ -37,9 +36,11 @@ export default {
       let cmdAlias = cmdData?.aliases || "No Alias";
       return await Neko.sendTextMessage(
         M.from,
-        `*${cmdName}* - ${cmdDesc}\n*Name:* ${cmdName1}\n*Usage:* ${cmdUsage}\n*Category:* ${cmdCategory}\n*Alias:* ${cmdAlias}`,M)
+        `*${cmdName}* - ${cmdDesc}\n*Name:* ${cmdName1}\n*Usage:* ${cmdUsage}\n*Category:* ${cmdCategory}\n*Alias:* ${cmdAlias}`,
+        M,
+      );
     } catch (error) {
       await Neko.error(error);
     }
-  } 
-}
+  },
+};

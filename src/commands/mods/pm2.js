@@ -14,12 +14,12 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      await Neko.sendTextMessage(M.from, "*Executing Command...*",M);
+      await Neko.sendTextMessage(M.from, "*Executing Command...*", M);
       let asyncExec = promisify(exec);
       await asyncExec(`pm2 ${M.args}`);
-      return await Neko.sendTextMessage(M.from, "*Command Executed...*",M);
+      return await Neko.sendTextMessage(M.from, "*Command Executed...*", M);
     } catch (error) {
-      await Neko.error(error)
+      await Neko.error(error);
     }
   },
-}
+};

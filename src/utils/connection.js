@@ -118,10 +118,13 @@ async function Connection(update, This, clearState) {
     );
     This.log("connect", `Number  : ${This?.user?.id?.split(":")[0]}`);
     This.log("connect", `Version : v6.7.7`);
-    This.log("connect", `Time : ${new Date().toLocaleString("id", { timeZone: "Asia/Kolkata" })}`);
-    This.log("info","Neko is connected!");
-    if(This.commands) {
-      This.log("info","Commands are loaded!");
+    This.log(
+      "connect",
+      `Time : ${new Date().toLocaleString("id", { timeZone: "Asia/Kolkata" })}`,
+    );
+    This.log("info", "Neko is connected!");
+    if (This.commands) {
+      This.log("info", "Commands are loaded!");
     }
   }
 }

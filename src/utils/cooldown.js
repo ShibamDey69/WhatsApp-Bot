@@ -9,7 +9,11 @@ const cooldown = async (userId, duration, func, Neko, M) => {
         if (cooldownEnd > currentTime) {
           const remainingTime = Math.ceil((cooldownEnd - currentTime) / 1000);
           Neko.sendReactMessage(M.from, "♥️", M);
-          Neko.sendTextMessage(M.from, `You are on cooldown. Please wait ${remainingTime} seconds before using this command again.`, M);
+          Neko.sendTextMessage(
+            M.from,
+            `You are on cooldown. Please wait ${remainingTime} seconds before using this command again.`,
+            M,
+          );
           return false;
         }
       }

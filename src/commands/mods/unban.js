@@ -22,7 +22,11 @@ export default {
 
         // Check if the group is banned
         if (!gc.isBanned && !usr) {
-          return Neko.sendTextMessage(M.from, `This group *${M.groupMeta.subject}* is not banned.`,M);
+          return Neko.sendTextMessage(
+            M.from,
+            `This group *${M.groupMeta.subject}* is not banned.`,
+            M,
+          );
         }
 
         // Check if the mentioned user is banned
@@ -38,7 +42,11 @@ export default {
         // Unban the group if no user is mentioned or quoted
         if (!user) {
           await Neko.gc_db.setGcBanned(M.from, false);
-          return Neko.sendTextMessage(M.from, `This group *${M.groupMeta.subject}* has been unbanned.`,M);
+          return Neko.sendTextMessage(
+            M.from,
+            `This group *${M.groupMeta.subject}* has been unbanned.`,
+            M,
+          );
         }
 
         // Unban the mentioned or quoted user
@@ -80,7 +88,11 @@ export default {
             );
           }
         } else {
-          return Neko.sendTextMessage(M.from, "Please mention or quote a user to unban.",M);
+          return Neko.sendTextMessage(
+            M.from,
+            "Please mention or quote a user to unban.",
+            M,
+          );
         }
       }
     } catch (error) {

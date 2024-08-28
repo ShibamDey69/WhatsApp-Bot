@@ -44,7 +44,12 @@ export default {
 
       switch (args[0].toLowerCase()) {
         case "--leave":
-          await Neko.sendMentionMessage(M.from, "*Bye Bye Guys!*",M.groupMeta.participants.map(v=>v.id), M);
+          await Neko.sendMentionMessage(
+            M.from,
+            "*Bye Bye Guys!*",
+            M.groupMeta.participants.map((v) => v.id),
+            M,
+          );
           await Neko.groupLeave(M.from);
           break;
         case "--info":

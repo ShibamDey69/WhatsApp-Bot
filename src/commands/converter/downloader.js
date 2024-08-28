@@ -37,7 +37,7 @@ export default {
         const instaRegex = new RegExp(
           "https?:\\/\\/(?:www\\.)?instagram\\.com\\/(?:p|tv|reel)\\/[\\w-]+\\/?",
         );
-        const ytRegex = "youtu"
+        const ytRegex = "youtu";
         if (instaRegex.test(url)) {
           return "insta";
         } else if (url.includes(ytRegex)) {

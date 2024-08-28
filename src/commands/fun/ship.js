@@ -13,7 +13,7 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      const user = M.isMentioned ? M.mention[0] : M?.quoted?.sender
+      const user = M.isMentioned ? M.mention[0] : M?.quoted?.sender;
       if (user.length < 1) {
         return await Neko.sendTextMessage(
           M.from,
@@ -24,9 +24,9 @@ export default {
       const user2 = M?.mention[1] || M.sender;
       const ship = Math.floor(Math.random() * 100) + 1;
       const shipText = `💖 *${ship}%* 💖\n*@${user.split("@")[0]} ❤️ @${user2.split("@")[0]}*`;
-      await Neko.sendMentionMessage(M.from, shipText,[user,user2] ,M);
+      await Neko.sendMentionMessage(M.from, shipText, [user, user2], M);
     } catch (error) {
       await Neko.error(error);
     }
-  } 
-}
+  },
+};

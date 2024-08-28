@@ -38,7 +38,7 @@ export default {
 
       text += `\n\n> ⚠️ _*Note:* Use ${M.prefix}info <command_name> for more info on a specific command. Example: *${M.prefix}info menu*_`;
       // Send the menu text as a message
-      await Neko.sendMentionMessage(M.from, text, [M.sender],M);
+      await Neko.sendMentionMessage(M.from, text, [M.sender], M);
     } catch (error) {
       await Neko.error(error);
     }

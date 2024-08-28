@@ -26,7 +26,7 @@ const Log = async (type, text, context = "PRIVATE") => {
       return console.log(clc.green.bold("[ ! ]"), clc.blue(text));
     case "message":
       return console.log(
-  clc.blueBright(`[${context.toUpperCase()}]`),
+        clc.blueBright(`[${context.toUpperCase()}]`),
         clc.greenBright(
           `[${new Date().toLocaleString("en-US", {
             timeZone: "Asia/Kolkata",
@@ -34,7 +34,7 @@ const Log = async (type, text, context = "PRIVATE") => {
         ),
         clc.whiteBright(text),
       );
-   }
+  }
 };
 
 export default Log;

@@ -75,7 +75,7 @@ export default {
       }
 
       let regex = /^https:\/\/t\.me\/addstickers\/[a-zA-Z0-9_]+$/;
-      
+
       if (!regex.test(M.args)) {
         return await Neko.sendTextMessage(
           M.from,
@@ -89,9 +89,9 @@ export default {
       }
 
       const text = M.args
-  .replaceAll("https://t.me/addstickers/", "")
-  .replaceAll("t.me/addstickers/", "");
-      
+        .replaceAll("https://t.me/addstickers/", "")
+        .replaceAll("t.me/addstickers/", "");
+
       const sticker = await tele.sticker(text);
       for (let i = 0; i < sticker.stickers.length; i++) {
         if (sticker.stickers[i].endsWith(".tgs")) {
@@ -112,7 +112,11 @@ export default {
           quality: 7,
         });
 
-        await Neko.sendStickerMessage(M.sender, await sticker_data.toBuffer(), M);
+        await Neko.sendStickerMessage(
+          M.sender,
+          await sticker_data.toBuffer(),
+          M,
+        );
       }
     } catch (error) {
       await Neko.error(error);

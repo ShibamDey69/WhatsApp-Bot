@@ -288,6 +288,7 @@ class NekoEmit extends EventEmitter {
   };
 
   error = async (err) => {
+    console.log(err);
     throw new Error(err);
   };
 }

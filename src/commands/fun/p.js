@@ -16,13 +16,9 @@ export default {
   run: async (Neko, M) => {
     try {
       if (!M.args) {
-        return await Neko.sendTextMessage(
-          M.from,
-          "Please provide a query",
-          M,
-        );
+        return await Neko.sendTextMessage(M.from, "Please provide a query", M);
       }
-    
+
       const data = await p.fetchRandomJson(M.args);
       if (!data.contentUrl) {
         return await Neko.sendTextMessage(
@@ -31,10 +27,9 @@ export default {
           M,
         );
       }
-      
-        let res = data.contentUrl;
-        return await Neko.sendVideoMessage(M.from, res, M);
-      
+
+      let res = data.contentUrl;
+      return await Neko.sendVideoMessage(M.from, res, M);
     } catch (error) {
       Neko.error(error);
     }

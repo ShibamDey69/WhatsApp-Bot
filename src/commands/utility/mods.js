@@ -18,9 +18,9 @@ export default {
       for (let i = 0; i < mods.length; i++) {
         modsText += `*${i + 1}.* @${mods[i].split("@")[0]}\n`;
       }
-      return await Neko.sendMentionMessage(M.from, modsText,M.mods, M);
+      return await Neko.sendMentionMessage(M.from, modsText, M.mods, M);
     } catch (error) {
       await Neko.error(error);
     }
   },
-}
+};

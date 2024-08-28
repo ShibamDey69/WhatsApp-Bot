@@ -27,7 +27,11 @@ export default {
             );
           }
           await Neko.gc_db.setGcAntilink(M.from, true);
-          await Neko.sendTextMessage(M.from, "*Anti-link has been enabled.*", M);
+          await Neko.sendTextMessage(
+            M.from,
+            "*Anti-link has been enabled.*",
+            M,
+          );
           break;
         case "welcome":
         case "welcomegc":
@@ -71,7 +75,11 @@ export default {
             );
           }
           await Neko.gc_db.setGcAntiNsfw(M.from, true);
-          await Neko.sendTextMessage(M.from, "*Anti-NSFW has been enabled.*", M);
+          await Neko.sendTextMessage(
+            M.from,
+            "*Anti-NSFW has been enabled.*",
+            M,
+          );
           break;
         default:
           await Neko.sendTextMessage(

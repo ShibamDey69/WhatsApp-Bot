@@ -36,10 +36,10 @@ export default {
           M,
         );
       }
-      
+
       const videos = data.all;
-      let {url} = videos[Math.floor(Math.random() * 1)];
-      
+      let { url } = videos[Math.floor(Math.random() * 1)];
+
       if (M.args.includes("--video") || M.args.includes("-v")) {
         let yt = new YT(url, "video");
         let res = await yt.download();
