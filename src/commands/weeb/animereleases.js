@@ -25,17 +25,20 @@ export default {
       if (!data) {
         return await Neko.sendTextMessage(M.from, "No anime releases found", M);
       }
-      data
-        .sort((resA, resB) => resA.airingAt - resB.airingAt)
-        .forEach(async (anime) => {
-          const { id, episode, media, airingAt } = anime;
-          const { title, description } = media;
-          const message = `*Id:* ${id}\n*Title:* ${title.romaji}\n*Episode:* ${episode}\n*Airing in:* ${new Date(airingAt * 1000 + 5 * 60 * 60 * 1000 + 30 * 60 * 1000).toLocaleString()}\n*Description:* ${description ?? "null"}\n `;
+      const sortedData = data.sort(
+        (resA, resB) => resA.airingAt - resB.airingAt);
 
+      for (const anime of sortedData) {
+        const { id, episode, media, airingAt } = anime;
+        const { title, description } = media;
+        const message = `*Id:* ${id}\n*Title:* ${title.romaji}\n*Episode:* ${episode}\n*Airing At:* ${new Date(airingAt * 1000 + 5 * 60 * 60 * 1000 + 30 * 60 * 1000).toLocaleString()}\n*Description:* ${description}`;
+
+        try {
           await Neko.sendTextMessage(M.from, message, M);
-        });
-
-      // await Neko.sendImageMessage(M.from, image_url, M,message);
+        } catch (error) {
+          console.error(`Failed to send message for Anime ID ${id}:`, error);
+        }
+      }
     } catch (error) {
       await Neko.error(error);
     }
