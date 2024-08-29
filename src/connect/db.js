@@ -202,6 +202,7 @@ class GroupDbFunc {
             isReassign: false,
             isNsfw: false,
             isAntiNsfw: false,
+            isChatAi: false,
             created: Date.now(),
           }));
         return newGroup;
@@ -348,6 +349,23 @@ class GroupDbFunc {
           throw new Error("Group not found");
         }
         groups[GroupId].isAntiNsfw = state;
+        fs.writeFileSync(groupFilePath, JSON.stringify(groups));
+      }
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
+  }
+
+  async setGcChatAi(groupId, state = true) {
+    try {
+      if (groupId.endsWith("@g.us")) {
+        let GroupId = groupId.replace("@g.us", "");
+        let groups = JSON.parse(fs.readFileSync(groupFilePath));
+        if (!groups[GroupId]) {
+          throw new Error("Group not found");
+        }
+        groups[GroupId].isChatAi = state;
         fs.writeFileSync(groupFilePath, JSON.stringify(groups));
       }
     } catch (error) {

@@ -6,6 +6,7 @@ import FormData from "form-data";
 import axios from "axios";
 import cooldown from "../utils/cooldown.js";
 import DB from "../connect/db.js";
+import CharacterAi from "../utils/characterAi.js";
 const gc_db = new DB.GroupDbFunc();
 const user_db = new DB.UserDbFunc();
 
@@ -87,6 +88,22 @@ const messageHandler = async (Neko, m) => {
         }
       }
 
+      if (gc.isChatAi) {
+        const M = await sequilizer(Neko, m);
+        if (M.isQuoted && M.quoted?.sender.split("@")[0] === process.argv[2] && !M.isBotMsg) {
+          const chatAi = new CharacterAi({
+            token: "84b1ad14a3715765412a55f9cccfe81fb714f397",
+            chat_id: M.sender,
+            char_id: "UQiZztjKGVrf6GQFDP2Qq5cBE1GualYgOUtSqRML4ic",
+            author_id: "524116483",
+          });
+          await chatAi.send(M.quoted.text);
+          chatAi.on("final.data", async (data) => {
+            return await Neko.sendTextMessage(M.from, data, M);
+          });
+          return true;
+        }
+      }
       if (
         gc.isAntiNsfw &&
         (messageType === "imageMessage" ||
