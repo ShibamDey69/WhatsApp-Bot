@@ -131,7 +131,7 @@ class NekoEmit extends EventEmitter {
   sendImageMessage = async (from, url, m, caption) => {
     return await this.sendMessage(
       from,
-      { image: typeof url === "string" ? { url } : url ,caption},
+      { image: typeof url === "string" ? { url } : url, caption },
       { quoted: m },
     );
   };
