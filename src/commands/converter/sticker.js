@@ -3,7 +3,7 @@ import { Sticker, StickerTypes } from "@shibam/sticker-maker";
 export default {
   name: "sticker",
   aliases: ["s"],
-  category: "fun",
+  category: "converter",
   cooldown: 1,
   description: "Converts image to sticker",
   usage: "sticker [reply to image]",

@@ -1,6 +1,6 @@
 {
-  "ownerNumber" : ["917047584741","9185151848233"],
-  "prefix":"/",
+  "ownerNumber" : ["917047584741"],
+  "prefix":"-",
   "BotName": "Neko",
   "response": {
       "welcome": [
