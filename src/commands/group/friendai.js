@@ -6,7 +6,7 @@ export default {
   usage: "friendai --true/false",
   isAdmin: false,
   isBotAdmin: false,
-  isGroup: false,
+  isGroup: true,
   isOwner: false,
   isPro: false,
   isMod: false,

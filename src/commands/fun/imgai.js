@@ -1,5 +1,6 @@
 import { Hercai } from "hercai";
 const hercai = new Hercai();
+import axios from "axios";
 export default {
   name: "imgai",
   aliases: ["image", "imagine", "img"],
@@ -56,7 +57,10 @@ export default {
           M,
         );
       }
-      await Neko.sendImageMessage(M.from, imageUrl.url, M);
+      let { data } = await axios.get(imageUrl.url, {
+        responseType: "stream"
+      })
+      await Neko.sendImageMessage(M.from, data, M);
     } catch (error) {
       await Neko.error(error);
     }

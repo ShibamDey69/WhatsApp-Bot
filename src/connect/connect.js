@@ -14,10 +14,10 @@ import Log from "../utils/logs.js";
 import pkg from "@whiskeysockets/baileys";
 const { proto } = pkg;
 const META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
-const loggerOptions = { level: "silent" };
-const logger = Pino(loggerOptions).child({
+const loggerOptions = {
   level: "silent",
-});
+};
+const logger = Pino(loggerOptions).child({});
 
 class NekoEmit extends EventEmitter {
   constructor(config) {
@@ -110,165 +110,211 @@ class NekoEmit extends EventEmitter {
   log = (type, text, text2) => Log(type, text, text2, this);
 
   sendStickerMessage = async (from, data, m) => {
-    return await this.sendMessage(from, { sticker: data }, { quoted: m });
+    try {
+      return await this.sendMessage(from, { sticker: data }, { quoted: m });
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendTextMessage = async (from, text, m) => {
-    return await this.sendMessage(from, { text }, { quoted: m });
+    try {
+      return await this.sendMessage(from, { text }, { quoted: m });
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendReactMessage = async (from, text = "♥️", m) => {
-    return await this.sendMessage(from, { react: { text: text, key: m.key } });
+    try {
+      return await this.sendMessage(from, {
+        react: { text: text, key: m.key },
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendEditMessage = async (from, text, m) => {
-    return await this.sendMessage(from, {
-      text,
-      edit: m.key,
-    });
+    try {
+      return await this.sendMessage(from, {
+        text,
+        edit: m.key,
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
-  sendImageMessage = async (from, url, m, caption) => {
-    return await this.sendMessage(
-      from,
-      { image: typeof url === "string" ? { url } : url, caption },
-      { quoted: m },
-    );
+  sendImageMessage = async (from, url, m, caption = "Neko") => {
+    try {
+      return await this.sendMessage(
+        from,
+        {
+          image: typeof url === "string" ? { url } : url,
+          caption,
+        },
+        { quoted: m },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendVideoMessage = async (from, url, m) => {
-    return await this.sendMessage(
-      from,
-      { video: typeof url === "string" ? { url } : url },
-      { quoted: m },
-    );
+    try {
+      return await this.sendMessage(
+        from,
+        { video: typeof url === "string" ? { url } : url },
+        { quoted: m },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendAudioMessage = async (from, url, m, ppt) => {
-    return await this.sendMessage(
-      from,
-      {
-        audio: typeof url === "string" ? { url } : url,
-        mimetype: "audio/mpeg",
-        ptt: ppt ?? false,
-      },
-      { quoted: m },
-    );
+    try {
+      return await this.sendMessage(
+        from,
+        {
+          audio: typeof url === "string" ? { url } : url,
+          mimetype: "audio/mpeg",
+          ptt: ppt ?? false,
+        },
+        { quoted: m },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendDocumentMessage = async (from, url, m) => {
-    return await this.sendMessage(
-      from,
-      {
-        document: typeof url === "string" ? { url } : url,
-        mimetype: "application/pdf",
-        fileName: `${~~(Math.random() * 1e9)}.pdf`,
-      },
-      { quoted: m },
-    );
+    try {
+      return await this.sendMessage(
+        from,
+        {
+          document: typeof url === "string" ? { url } : url,
+          mimetype: "application/pdf",
+          fileName: `${~~(Math.random() * 1e9)}.pdf`,
+        },
+        { quoted: m },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
-  sendMentionMessage = async (from, text, mention, m) => {
-    return await this.sendMessage(
-      from,
-      { text, mentions: mention },
-      { quoted: m },
-    );
+  sendMentionMessage = async (from, text, mentions, m) => {
+    try {
+      return await this.sendMessage(from, { text, mentions }, { quoted: m });
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   sendTextButton = async (from, text, text2, text3, m) => {
-    let msg = generateWAMessageFromContent(
-      from,
-      {
-        viewOnceMessage: {
-          message: {
-            messageContextInfo: {
-              deviceListMetadata: {},
-              deviceListMetadataVersion: 2,
-            },
-            interactiveMessage: proto.Message.InteractiveMessage.create({
-              body: proto.Message.InteractiveMessage.Body.create({
-                text,
-              }),
-              footer: proto.Message.InteractiveMessage.Footer.create({
-                text: `© ${META_DATA.BotName} 2024`,
-              }),
-              header: proto.Message.InteractiveMessage.Header.create({
-                title: "",
-                subtitle: "Cat is Love",
-                hasMediaAttachment: false,
-              }),
-              nativeFlowMessage:
-                proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                  buttons: [
-                    {
-                      name: "quick_reply",
-                      buttonParamsJson: `{"display_text":${text2},"id":${text3}}`,
-                    },
-                  ],
+    try {
+      let msg = generateWAMessageFromContent(
+        from,
+        {
+          viewOnceMessage: {
+            message: {
+              messageContextInfo: {
+                deviceListMetadata: {},
+                deviceListMetadataVersion: 2,
+              },
+              interactiveMessage: proto.Message.InteractiveMessage.create({
+                body: proto.Message.InteractiveMessage.Body.create({
+                  text,
                 }),
-            }),
+                footer: proto.Message.InteractiveMessage.Footer.create({
+                  text: `© ${META_DATA.BotName} 2024`,
+                }),
+                header: proto.Message.InteractiveMessage.Header.create({
+                  title: "",
+                  subtitle: "Cat is Love",
+                  hasMediaAttachment: false,
+                }),
+                nativeFlowMessage:
+                  proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                    buttons: [
+                      {
+                        name: "quick_reply",
+                        buttonParamsJson: `{"display_text":${text2},"id":${text3}}`,
+                      },
+                    ],
+                  }),
+              }),
+            },
           },
         },
-      },
-      {},
-    );
+        {},
+      );
 
-    await this.relayMessage(
-      from,
-      msg.message,
-      {
-        messageId: msg.key.id,
-      },
-      { quoted: m },
-    );
+      await this.relayMessage(
+        from,
+        msg.message,
+        {
+          messageId: msg.key.id,
+        },
+        { quoted: m },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   };
+
   sendButton = async (from, text, button = [], m) => {
-    let msg = generateWAMessageFromContent(
-      from,
-      {
-        viewOnceMessage: {
-          message: {
-            messageContextInfo: {
-              deviceListMetadata: {},
-              deviceListMetadataVersion: 2,
-            },
-            interactiveMessage: proto.Message.InteractiveMessage.create({
-              body: proto.Message.InteractiveMessage.Body.create({
-                text,
-              }),
-              footer: proto.Message.InteractiveMessage.Footer.create({
-                text: `© ${META_DATA.BotName} 2024`,
-              }),
-              header: proto.Message.InteractiveMessage.Header.create({
-                title: "",
-                subtitle: "Cat is Love",
-                hasMediaAttachment: false,
-              }),
-              nativeFlowMessage:
-                proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                  buttons: [...button],
+    try {
+      let msg = generateWAMessageFromContent(
+        from,
+        {
+          viewOnceMessage: {
+            message: {
+              messageContextInfo: {
+                deviceListMetadata: {},
+                deviceListMetadataVersion: 2,
+              },
+              interactiveMessage: proto.Message.InteractiveMessage.create({
+                body: proto.Message.InteractiveMessage.Body.create({
+                  text,
                 }),
-            }),
+                footer: proto.Message.InteractiveMessage.Footer.create({
+                  text: `© ${META_DATA.BotName} 2024`,
+                }),
+                header: proto.Message.InteractiveMessage.Header.create({
+                  title: "",
+                  subtitle: "Cat is Love",
+                  hasMediaAttachment: false,
+                }),
+                nativeFlowMessage:
+                  proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                    buttons: [...button],
+                  }),
+              }),
+            },
           },
         },
-      },
-      {},
-    );
+        {},
+      );
 
-    await this.relayMessage(
-      from,
-      msg.message,
-      {
-        messageId: msg.key.id,
-      },
-      { quoted: m },
-    );
+      await this.relayMessage(
+        from,
+        msg.message,
+        {
+          messageId: msg.key.id,
+        },
+        { quoted: m },
+      );
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
   downloadMediaContent = async (Neko, M) => {
     try {
-      const stream = await downloadMediaMessage(
+      const buffer = await downloadMediaMessage(
         M,
         "buffer",
         {},
@@ -276,9 +322,9 @@ class NekoEmit extends EventEmitter {
           reuploadRequest: Neko.updateMediaMessage,
         },
       );
-      const dataType = await fileTypeFromBuffer(stream);
+      const dataType = await fileTypeFromBuffer(buffer);
       return {
-        data: stream,
+        data: buffer,
         mime: dataType.mime,
         ext: dataType.ext,
       };

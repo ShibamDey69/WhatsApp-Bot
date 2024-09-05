@@ -1,6 +1,6 @@
 entrypoint = "src/index.js"
 hidden = [".config", "package-lock.json"]
-modules = ["nodejs-20:v8-20230920-bd784b9", "python-3.10:v25-20230920-d4ad2e4"]
+modules = ["nodejs-20:v8-20230920-bd784b9", "python-3.10:v25-20230920-d4ad2e4", "nodejs-22"]
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
