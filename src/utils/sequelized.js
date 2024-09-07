@@ -100,7 +100,7 @@ const sequilizer = async (Neko, m) => {
       isPro: [...modsList, ...pros].includes(sender),
       isReassign: Reassign.includes(from),
       isCmd: text?.startsWith(META_DATA.prefix),
-      isBotMsg: m.pushName ?? false,
+      isBotMsg: m.pushName?.length === 0,
       isBotAdmin: isGroup
         ? admins.includes(`${Neko.user.id.split(":")[0]}@s.whatsapp.net`)
         : false,
