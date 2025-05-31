@@ -9,7 +9,7 @@
   "type": "module",
   "dependencies": {
     "@shibam/sticker-maker": "^1.2.15",
-    "@whiskeysockets/baileys": "^6.7.9",
+    "@whiskeysockets/baileys": "^6.7.17",
     "axios": "^1.7.5",
     "axios-cookiejar-support": "^5.0.5",
     "cheerio": "^1.0.0",

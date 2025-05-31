@@ -15,71 +15,71 @@ const groupHandler = async (Neko, m) => {
   });
 
   operation.attempt(async (currentAttempt) => {
-    let M = await sequelizer(Neko, m);
     try {
+      if (!m || !m.id || !m.action || !m.participants) return;
       let gc_db = new DB.GroupDbFunc();
-      const gc = await gc_db.getGroup(M?.id, M?.groupMeta?.subject);
-      switch (M?.action) {
+      const gc = await gc_db.getGroup(m.id);
+      switch (m.action && m.author.includes("@s.whatsapp.net")) {
         case "promote":
           if (gc.isReassign) {
-            let promoted = M.participants[0];
+            let promoted = m.participants[0];
             let message = Neko.res.response.promotion[
-              ~~(Math.random() * Neko.res.response.promotion.length)
+              Math.floor(Math.random() * Neko.res.response.promotion.length)
             ]
               .replace("{x}", `*@${promoted.split("@")[0]}*`)
-              .replace("{y}", `*@${M?.author?.split("@")[0]}*`);
+              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
             await Neko.sendMentionMessage(
-              M.id,
+              m.id,
               message,
-              [M.author, promoted],
+              [m.author, promoted],
               null,
             );
           }
           break;
         case "demote":
           if (gc.isReassign) {
-            let demoted = M.participants[0];
+            let demoted = m.participants[0];
             let message2 = Neko.res.response.demotion[
-              ~~(Math.random() * Neko.res.response.demotion.length)
+              Math.floor(Math.random() * Neko.res.response.demotion.length)
             ]
               .replace("{x}", `*@${demoted.split("@")[0]}*`)
-              .replace("{y}", `*@${M?.author?.split("@")[0]}*`);
+              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
             await Neko.sendMentionMessage(
-              M.id,
+              m.id,
               message2,
-              [M.author, demoted],
+              [m.author, demoted],
               null,
             );
           }
           break;
         case "add":
           if (gc.isWelcome) {
-            let added = M.participants[0];
+            let added = m.participants[0];
             let message3 = Neko.res.response.welcome[
-              ~~(Math.random() * Neko.res.response.welcome.length)
+              Math.floor(Math.random() * Neko.res.response.welcome.length)
             ]
               .replace("{x}", `*@${added.split("@")[0]}*`)
-              .replace("{y}", `*@${M?.author?.split("@")[0]}*`);
+              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
             await Neko.sendMentionMessage(
-              M.id,
+              m.id,
               message3,
-              [M.author, added],
+              [m.author, added],
               null,
             );
           }
           break;
         case "remove":
           if (gc.isWelcome) {
-            let removed = M.participants[0];
+            let removed = m.participants[0];
             let message4 = Neko.res.response.bye[
-              ~~(Math.random() * Neko.res.response.bye.length)
+              Math.floor(Math.random() * Neko.res.response.bye.length)
             ]
               .replace("{x}", `*@${removed.split("@")[0]}*`)
-              .replace("{y}", `*@${M?.author?.split("@")[0]}*`);
+              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
             await Neko.sendMentionMessage(
-              M.id,
+              m.id,
               message4,
-              [M.author, removed],
+              [m.author, removed],
               null,
             );
           }

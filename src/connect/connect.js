@@ -27,17 +27,17 @@ class NekoEmit extends EventEmitter {
     this.logger = logger;
   }
   async connect() {
-    if (!fs.existsSync("Auth-Info")) {
-      await fs.promises.mkdir("Auth-Info");
+    if (!fs.existsSync("Auth_Info")) {
+      await fs.promises.mkdir("Auth_Info");
     }
     const clearState = async () => {
-      await fs.promises.rm(`./Auth-Info/${this.socketConfig.session}`, {
+      await fs.promises.rm(`./Auth_Info/${this.socketConfig.session}`, {
         recursive: true,
       });
       process.exit(0);
     };
     const { saveCreds, state } = await useMultiFileAuthState(
-      `./Auth-Info/${this.socketConfig.session}`,
+      `./Auth_Info/${this.socketConfig.session}`,
     );
     const Neko = makeWASocket({
       ...this.socketConfig,
@@ -49,7 +49,7 @@ class NekoEmit extends EventEmitter {
 
     if (!Neko.authState.creds.registered) {
       setTimeout(async () => {
-        let code = await Neko.requestPairingCode(process.argv[2]);
+        let code = await Neko.requestPairingCode(process.env.PHONE_NUMBER);
         console.log(`Pair Code: ${code}`);
       }, 4000);
     }
