@@ -75,6 +75,7 @@ const messageHandler = async (Neko, m) => {
         (M?.messageType === "imageMessage" ||
           M?.messageType === "stickerMessage")
       ) {
+        
         const data = await Neko.downloadMediaContent(Neko, M);
         const res = await NsfwDetector(data);
         if (
@@ -85,7 +86,7 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendMentionMessage(
             M.from,
             `*_This is a warning! @${M?.sender.split("@")[0]} if you send nsfw again! You can get kicked from this group_*`,
-            [M?.sender],
+            [M.sender],
           );
           return true;
         }

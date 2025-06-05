@@ -19,7 +19,8 @@ const groupHandler = async (Neko, m) => {
       if (!m || !m.id || !m.action || !m.participants) return;
       let gc_db = new DB.GroupDbFunc();
       const gc = await gc_db.getGroup(m.id);
-      switch (m.action && m.author.includes("@s.whatsapp.net")) {
+      if (gc && m.author && m.author.includes("@s.whatsapp.net")) {
+      switch (m.action) {
         case "promote":
           if (gc.isReassign) {
             let promoted = m.participants[0];
@@ -87,6 +88,7 @@ const groupHandler = async (Neko, m) => {
         default:
           break;
       }
+    }
     } catch (error) {
       if (error.data === 429) {
         let retryAfter = error.data?.headers?.["retry-after"] * 1000 || 30000;

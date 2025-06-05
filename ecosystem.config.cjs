@@ -10,7 +10,8 @@ module.exports = {
       env: {
         NODE_ENV: "development",
         SESSION_ID: "SHIBAM",
-        PHONE_NUMBER: process.env.PHONE_NUMBER || "1234567890",
+        PHONE_NUMBER: "1234567890", // Replace with your phone number
+        PREFIX: "!"
       }
     }
   ]

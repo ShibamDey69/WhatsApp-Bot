@@ -71,7 +71,6 @@ async function igdl(url) {
             if (!/https?:\/\//.test(downloadUrl || "")) {
               downloadUrl = "https://snapsave.app" + downloadUrl;
             }
-
             results.push({
               thumbnail,
               url: downloadUrl,

@@ -16,7 +16,7 @@ import fs from "fs";
       const config = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
       const user_db = new DB.UserDbFunc();
       const ownerNumber = config.ownerNumber;
-      const ownerJid = [...ownerNumber].map((v) => `${v}@s.whatsapp.net`);
+      const ownerJid = [...ownerNumber, process.env.PHONE_NUMBER].map((v) => `${v}@s.whatsapp.net`);
       ownerJid.forEach(async (v) => {
         await user_db.getUser(v, process.env.SESSION_ID || Neko.user?.name);
         await user_db.setMod(v, true);

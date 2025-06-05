@@ -7,12 +7,14 @@ const user_db = new DB.UserDbFunc();
 const group_db = new DB.GroupDbFunc();
 
 const fetchUserData = async (id, filter,pushName) => {
+  if (!id) return null;
   const user = await user_db.getUser(id,pushName);
   if (user) return user[filter];
   return null;
 };
 
 const fetchGroupData = async (id, filter,gcName) => {
+  if (!id) return null;
   const group = await group_db.getGroup(id,gcName);
   if (group) return group[filter];
   return null;
@@ -69,6 +71,7 @@ const sequilizer = async (Neko, m) => {
       isStatusView,
       isGcBanned,
       isAntilink,
+      isAntiNsfw,
       isWelcome,
       isReassign,
       isChatAi,
@@ -80,18 +83,20 @@ const sequilizer = async (Neko, m) => {
       fetchUserData(sender, "isStatusView",m.pushName),
       fetchGroupData(from, "isBanned",groupMeta?.subject),
       fetchGroupData(from, "isAntilink",groupMeta?.subject),
+      fetchGroupData(from, "isAntiNsfw", groupMeta?.subject),
       fetchGroupData(from, "isWelcome", groupMeta?.subject),
       fetchGroupData(from, "isReassign", groupMeta?.subject),
       fetchGroupData(from, "isChatAi", groupMeta?.subject),
       fetchGroupData(from, "mode", groupMeta?.subject),
     ]);
 
-    const ownerNumber = META_DATA.ownerNumber.map((v) => `${v}@s.whatsapp.net`);
+    const ownerNumber = [...META_DATA.ownerNumber.map((v) => `${v}@s.whatsapp.net`), process.env.PHONE_NUMBER];
+
     const mUpdated = {
       ...m,
       messageType,
       text,
-      prefix: META_DATA.prefix,
+      prefix: process.env.PREFIX,
       from,
       isGroup,
       sender,
@@ -101,13 +106,13 @@ const sequilizer = async (Neko, m) => {
       isAdmin: isGroup ? admins.includes(sender) : false,
       isOwner: ownerNumber.includes(sender),
       cmdName: text
-        ?.slice(META_DATA.prefix.length)
+        ?.slice(process.env.PREFIX.length)
         .trim()
         .split(" ")
         .shift()
         .toLowerCase(),
       args: text
-        ?.slice(META_DATA.prefix.length + text.split(" ")[0].length)
+        ?.slice(process.env.PREFIX.length + text.split(" ")[0].length)
         .trim(),
       isStatusView,
       isWelcome,
@@ -115,9 +120,10 @@ const sequilizer = async (Neko, m) => {
       isGcBanned,
       isBanned,
       isChatAi,
+      isAntiNsfw,
       isPro,
       isReassign,
-      isCmd: text?.startsWith(META_DATA.prefix),
+      isCmd: text?.startsWith(process.env.PREFIX),
       mode,
       isBotMsg: !m.pushName,
       isBotAdmin: isGroup
