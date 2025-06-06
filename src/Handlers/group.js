@@ -4,8 +4,56 @@ import sequelizer from "../utils/sequelized.js";
 import DB from "../connect/db.js";
 // Define the retry function
 const groupHandler = async (Neko, m) => {
-  let res = await fs.promises.readFile("src/config.json");
-  Neko.res = JSON.parse(res);
+  let response = {
+    welcome: [
+      "*Welcome* to the group! We're thrilled to have you with us, {x}, by {y}.",
+      "Hello and *welcome*, {x}, by {y}! We're excited to see what you'll bring to our community.",
+      "Hi there, {x}, by {y}! *Welcome* aboard. Feel free to introduce yourself and let us know how we can support you.",
+      "*Welcome*, {x}, by {y}! We're happy to have you here. Looking forward to your contributions.",
+      "Greetings, {x}, by {y}! It's great to have you join us. Don't hesitate to reach out if you have any questions.",
+      "Hey, {x}, by {y}! *Welcome* to the team. We're excited to get to know you better.",
+      "*Welcome*, {x}, by {y}! We're delighted to have you here. Let's make great things happen together.",
+      "Hi and *welcome*, {x}, by {y}! We're a friendly bunch, so make yourself at home.",
+      "*Welcome*, {x}, by {y}! We're looking forward to seeing your unique perspective and ideas.",
+      "Hello, {x}, by {y}! Great to have you with us. Let's make this journey amazing together.",
+    ],
+    promotion: [
+      "Congratulations, {x}, by {y}! You've been *promoted*! Well deserved!",
+      "Well done, {x}, by {y}! Your hard work has paid off with this *promotion*.",
+      "Fantastic news, {x}, by {y}! You've earned this *promotion* through your dedication.",
+      "Congrats, {x}, by {y}! Your *promotion* is a testament to your effort and skill.",
+      "Great job, {x}, by {y}! Enjoy your well-deserved *promotion*!",
+      "Kudos, {x}, by {y}! You've been *promoted*. Keep up the excellent work!",
+      "Amazing work, {x}, by {y}! Your *promotion* is a big achievement.",
+      "Congratulations, {x}, by {y}! You've moved up thanks to your hard work.",
+      "Bravo, {x}, by {y}! You've earned this *promotion* with your commitment.",
+      "Well deserved, {x}, by {y}! Your *promotion* is proof of your great contributions.",
+    ],
+    demotion: [
+      "Hello, {x}, by {y}. Unfortunately, we've had to make some changes and you've been *demoted*. Let's work together to improve.",
+      "Hi, {x}, by {y}. Due to certain reasons, we've had to *demote* you. We're here to support you in getting back on track.",
+      "Dear {x}, by {y}, we regret to inform you that you've been *demoted*. Let's discuss how we can help you move forward.",
+      "Hi, {x}, by {y}. You've been *demoted*. Please reach out if you need any assistance during this transition.",
+      "Hello, {x}, by {y}. We've had to make a difficult decision to *demote* you. Let's focus on growth and improvement.",
+      "Dear {x}, by {y}, we're sorry to inform you that you've been *demoted*. We're here to help you through this.",
+      "Hi, {x}, by {y}. You've been *demoted*. Let's talk about what we can do to support your progress.",
+      "Hello, {x}, by {y}. Due to recent evaluations, you've been *demoted*. We're here to help you improve.",
+      "Dear {x}, by {y}, you've been *demoted*. Let's work together to get you back on track.",
+      "Hi, {x}, by {y}. We had to *demote* you. Please let us know how we can support your development.",
+    ],
+    bye: [
+      "Goodbye, {x}, by {y}! We'll miss you. Take care and stay in touch!",
+      "Farewell, {x}, by {y}. It's been great having you with us.",
+      "Bye, {x}, by {y}! Wishing you all the best for the future.",
+      "Goodbye, {x}, by {y}. Thank you for your contributions and good luck ahead!",
+      "Take care, {x}, by {y}! Hope to see you again soon.",
+      "Farewell, {x}, by {y}. You've been a wonderful part of our community.",
+      "Bye, {x}, by {y}! Stay safe and keep in touch.",
+      "Goodbye, {x}, by {y}. We'll always remember your time with us.",
+      "See you later, {x}, by {y}! Best wishes on your journey ahead.",
+      "Farewell, {x}, by {y}. It's sad to see you go but we're grateful for your time here.",
+    ],
+  };
 
   const operation = retry.operation({
     retries: 3,
@@ -20,75 +68,75 @@ const groupHandler = async (Neko, m) => {
       let gc_db = new DB.GroupDbFunc();
       const gc = await gc_db.getGroup(m.id);
       if (gc && m.author && m.author.includes("@s.whatsapp.net")) {
-      switch (m.action) {
-        case "promote":
-          if (gc.isReassign) {
-            let promoted = m.participants[0];
-            let message = Neko.res.response.promotion[
-              Math.floor(Math.random() * Neko.res.response.promotion.length)
-            ]
-              .replace("{x}", `*@${promoted.split("@")[0]}*`)
-              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
-            await Neko.sendMentionMessage(
-              m.id,
-              message,
-              [m.author, promoted],
-              null,
-            );
-          }
-          break;
-        case "demote":
-          if (gc.isReassign) {
-            let demoted = m.participants[0];
-            let message2 = Neko.res.response.demotion[
-              Math.floor(Math.random() * Neko.res.response.demotion.length)
-            ]
-              .replace("{x}", `*@${demoted.split("@")[0]}*`)
-              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
-            await Neko.sendMentionMessage(
-              m.id,
-              message2,
-              [m.author, demoted],
-              null,
-            );
-          }
-          break;
-        case "add":
-          if (gc.isWelcome) {
-            let added = m.participants[0];
-            let message3 = Neko.res.response.welcome[
-              Math.floor(Math.random() * Neko.res.response.welcome.length)
-            ]
-              .replace("{x}", `*@${added.split("@")[0]}*`)
-              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
-            await Neko.sendMentionMessage(
-              m.id,
-              message3,
-              [m.author, added],
-              null,
-            );
-          }
-          break;
-        case "remove":
-          if (gc.isWelcome) {
-            let removed = m.participants[0];
-            let message4 = Neko.res.response.bye[
-              Math.floor(Math.random() * Neko.res.response.bye.length)
-            ]
-              .replace("{x}", `*@${removed.split("@")[0]}*`)
-              .replace("{y}", `*@${m.author?.split("@")[0]}*`);
-            await Neko.sendMentionMessage(
-              m.id,
-              message4,
-              [m.author, removed],
-              null,
-            );
-          }
-          break;
-        default:
-          break;
+        switch (m.action) {
+          case "promote":
+            if (gc.isReassign) {
+              let promoted = m.participants[0];
+              let message = response.promotion[
+                Math.floor(Math.random() * response.promotion.length)
+              ]
+                .replace("{x}", `*@${promoted.split("@")[0]}*`)
+                .replace("{y}", `*@${m.author?.split("@")[0]}*`);
+              await Neko.sendMentionMessage(
+                m.id,
+                message,
+                [m.author, promoted],
+                null,
+              );
+            }
+            break;
+          case "demote":
+            if (gc.isReassign) {
+              let demoted = m.participants[0];
+              let message2 = response.demotion[
+                Math.floor(Math.random() * response.demotion.length)
+              ]
+                .replace("{x}", `*@${demoted.split("@")[0]}*`)
+                .replace("{y}", `*@${m.author?.split("@")[0]}*`);
+              await Neko.sendMentionMessage(
+                m.id,
+                message2,
+                [m.author, demoted],
+                null,
+              );
+            }
+            break;
+          case "add":
+            if (gc.isWelcome) {
+              let added = m.participants[0];
+              let message3 = response.welcome[
+                Math.floor(Math.random() * response.welcome.length)
+              ]
+                .replace("{x}", `*@${added.split("@")[0]}*`)
+                .replace("{y}", `*@${m.author?.split("@")[0]}*`);
+              await Neko.sendMentionMessage(
+                m.id,
+                message3,
+                [m.author, added],
+                null,
+              );
+            }
+            break;
+          case "remove":
+            if (gc.isWelcome) {
+              let removed = m.participants[0];
+              let message4 = response.bye[
+                Math.floor(Math.random() * response.bye.length)
+              ]
+                .replace("{x}", `*@${removed.split("@")[0]}*`)
+                .replace("{y}", `*@${m.author?.split("@")[0]}*`);
+              await Neko.sendMentionMessage(
+                m.id,
+                message4,
+                [m.author, removed],
+                null,
+              );
+            }
+            break;
+          default:
+            break;
+        }
       }
-    }
     } catch (error) {
       if (error.data === 429) {
         let retryAfter = error.data?.headers?.["retry-after"] * 1000 || 30000;

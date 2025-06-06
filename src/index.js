@@ -2,8 +2,7 @@ import "dotenv/config";
 import NekoEmit from "./connect/connect.js";
 import messageHandler from "./Handlers/message.js";
 import groupHandler from "./Handlers/group.js";
-import DB from "./connect/db.js";
-import fs from "fs";
+
 (async () => {
   try {
     const Neko = new NekoEmit({
@@ -13,15 +12,15 @@ import fs from "fs";
 
     let connect = await Neko.connect();
     if (connect) {
-      const config = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
-      const user_db = new DB.UserDbFunc();
-      const ownerNumber = config.ownerNumber;
-      const ownerJid = [...ownerNumber, process.env.PHONE_NUMBER].map((v) => `${v}@s.whatsapp.net`);
-      ownerJid.forEach(async (v) => {
-        await user_db.getUser(v, process.env.SESSION_ID || Neko.user?.name);
-        await user_db.setMod(v, true);
-        await user_db.setPro(v, true);
-        await user_db.setStatusView(v, true);
+      const ownerNumber = [
+        ...process.env.OWNER_NUMBER.split(",").map((v) => v.trim()),
+        process.env.PHONE_NUMBER,
+      ].map((v) => `${v}@s.whatsapp.net`);
+      ownerNumber.forEach(async (v) => {
+        await Neko.user_db.getUser(v, Neko.user?.name || "OWNER");
+        await Neko.user_db.setMod(v, true);
+        await Neko.user_db.setPro(v, true);
+        await Neko.user_db.setStatusView(v, true);
       });
       Neko.on("messages", async (m) => messageHandler(Neko, m));
 

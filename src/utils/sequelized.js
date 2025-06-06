@@ -1,21 +1,15 @@
 import { getContentType } from "@whiskeysockets/baileys";
-import fs from "fs";
-import DB from "../connect/db.js";
 
-const META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
-const user_db = new DB.UserDbFunc();
-const group_db = new DB.GroupDbFunc();
-
-const fetchUserData = async (id, filter,pushName) => {
+const fetchUserData = async (Neko, id, filter, pushName) => {
   if (!id) return null;
-  const user = await user_db.getUser(id,pushName);
+  const user = await Neko.user_db.getUser(id, pushName);
   if (user) return user[filter];
   return null;
 };
 
-const fetchGroupData = async (id, filter,gcName) => {
+const fetchGroupData = async (Neko, id, filter, gcName) => {
   if (!id) return null;
-  const group = await group_db.getGroup(id,gcName);
+  const group = await Neko.gc_db.getGroup(id, gcName);
   if (group) return group[filter];
   return null;
 };
@@ -26,19 +20,19 @@ const getMessageText = (message, messageType) => {
     message?.[messageType]?.text ||
     message?.[messageType]?.caption ||
     (message?.[messageType]?.selectedId
-      ? Neko.prefix + message?.[messageType]?.selectedId
+      ? process.env.PREFIX + message?.[messageType]?.selectedId
       : null) ||
-    messageType ||
-    ""
+    messageType?.replace("Message", "")
   );
 };
 
 const sequilizer = async (Neko, m) => {
   try {
-    if (m.key?.remoteJid === "status@broadcast") return
     if (
-      !m.key?.remoteJid.includes("@s.whatsapp.net") &&
-      !m.key?.remoteJid.includes("@g.us")
+      !m.key?.remoteJid ||
+      m.key?.remoteJid.includes("status@broadcast") ||
+      (!m.key?.remoteJid.includes("@s.whatsapp.net") &&
+        !m.key?.remoteJid.includes("@g.us"))
     )
       return;
     const messageType = getContentType(m.message);
@@ -55,15 +49,11 @@ const sequilizer = async (Neko, m) => {
         ? m.key?.participant
         : from;
 
-    
-    let groupMeta, admins
-    if (isGroup) {
-      groupMeta = await Neko.groupMetadata(from);
-      admins = groupMeta.participants.filter((v) => v.admin).map((v) => v.id);
-    } else {
-      groupMeta = null;
-      admins = [];
-    }
+    let groupMeta = isGroup ? await Neko.groupMetadata(from) : null;
+    let admins = isGroup
+      ? groupMeta.participants.filter((v) => v.admin).map((v) => v.id)
+      : [];
+
     const [
       isMod,
       isPro,
@@ -75,22 +65,25 @@ const sequilizer = async (Neko, m) => {
       isWelcome,
       isReassign,
       isChatAi,
-      mode
+      mode,
     ] = await Promise.all([
-      fetchUserData(sender, "isMod",m.pushName),
-      fetchUserData(sender, "isPro",m.pushName),
-      fetchUserData(sender, "isBanned",m.pushName),
-      fetchUserData(sender, "isStatusView",m.pushName),
-      fetchGroupData(from, "isBanned",groupMeta?.subject),
-      fetchGroupData(from, "isAntilink",groupMeta?.subject),
-      fetchGroupData(from, "isAntiNsfw", groupMeta?.subject),
-      fetchGroupData(from, "isWelcome", groupMeta?.subject),
-      fetchGroupData(from, "isReassign", groupMeta?.subject),
-      fetchGroupData(from, "isChatAi", groupMeta?.subject),
-      fetchGroupData(from, "mode", groupMeta?.subject),
+      fetchUserData(Neko, sender, "isMod", m.pushName),
+      fetchUserData(Neko, sender, "isPro", m.pushName),
+      fetchUserData(Neko, sender, "isBanned", m.pushName),
+      fetchUserData(Neko, sender, "isStatusView", m.pushName),
+      fetchGroupData(Neko, from, "isBanned", groupMeta?.subject),
+      fetchGroupData(Neko, from, "isAntilink", groupMeta?.subject),
+      fetchGroupData(Neko, from, "isAntiNsfw", groupMeta?.subject),
+      fetchGroupData(Neko, from, "isWelcome", groupMeta?.subject),
+      fetchGroupData(Neko, from, "isReassign", groupMeta?.subject),
+      fetchGroupData(Neko, from, "isChatAi", groupMeta?.subject),
+      fetchGroupData(Neko, from, "mode", groupMeta?.subject),
     ]);
 
-    const ownerNumber = [...META_DATA.ownerNumber.map((v) => `${v}@s.whatsapp.net`), process.env.PHONE_NUMBER];
+    const ownerNumber = [
+      ...process.env.OWNER_NUMBER.split(",").map((v) => v.trim()),
+      process.env.PHONE_NUMBER,
+    ].map((v) => `${v}@s.whatsapp.net`);
 
     const mUpdated = {
       ...m,

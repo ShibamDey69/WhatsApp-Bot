@@ -1,4 +1,3 @@
-
 # WhatsApp Bot
 
 A powerful and customizable WhatsApp bot built with Node.js and @whiskeysockets/baileys
@@ -48,17 +47,17 @@ You can start the bot using either Node.js directly or with PM2 for production.
 
 #### 1. Simple Node.js
 
-   ```bash
-   export SHIBAM && node src/index.js BOT_NUMBER
-   ```
+```bash
+export SHIBAM && node src/index.js BOT_NUMBER
+```
 
 #### 2. Using PM2 (recommended for production)
 
-   ```bash
-   pm2 start ecosystem.config.js -- BOT_NUMBER
-   ```
+```bash
+pm2 start ecosystem.config.js -- BOT_NUMBER
+```
 
-   Replace `BOT_NUMBER` with the actual number assigned to the bot.
+Replace `BOT_NUMBER` with the actual number assigned to the bot.
 
 ### Additional Information
 
@@ -67,4 +66,3 @@ You can start the bot using either Node.js directly or with PM2 for production.
 ### License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

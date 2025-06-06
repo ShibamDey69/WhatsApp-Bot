@@ -2,7 +2,6 @@ import {
   makeWASocket,
   useMultiFileAuthState,
   downloadMediaMessage,
-  generateWAMessageFromContent,
 } from "@whiskeysockets/baileys";
 import fs from "fs";
 import Pino from "pino";
@@ -11,9 +10,7 @@ import { fileTypeFromBuffer } from "file-type";
 import Connection from "../utils/connection.js";
 import loadCommands from "../utils/commands.js";
 import Log from "../utils/logs.js";
-import pkg from "@whiskeysockets/baileys";
-const { proto } = pkg;
-const META_DATA = JSON.parse(fs.readFileSync("src/config.json", "utf-8"));
+import DB from "../connect/db.js";
 const loggerOptions = {
   level: "silent",
 };
@@ -25,7 +22,13 @@ class NekoEmit extends EventEmitter {
     this.socketConfig = config;
     this.time = new Date();
     this.logger = logger;
+    this.gc_db = new DB.GroupDbFunc();
+    this.user_db = new DB.UserDbFunc();
+    this.from = null;
+    this.mess = null;
+    this.commands = null;
   }
+
   async connect() {
     if (!fs.existsSync("Auth_Info")) {
       await fs.promises.mkdir("Auth_Info");
@@ -103,7 +106,6 @@ class NekoEmit extends EventEmitter {
         this[key] = Neko[key];
       }
     }
-    this.prefix = META_DATA.prefix;
     this.commands = await loadCommands();
     return true;
   }
@@ -216,105 +218,6 @@ class NekoEmit extends EventEmitter {
   sendMentionMessage = async (from, text, mentions, m) => {
     try {
       return await this.sendMessage(from, { text, mentions }, { quoted: m });
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
-
-  sendTextButton = async (from, text, text2, text3, m) => {
-    try {
-      let msg = generateWAMessageFromContent(
-        from,
-        {
-          viewOnceMessage: {
-            message: {
-              messageContextInfo: {
-                deviceListMetadata: {},
-                deviceListMetadataVersion: 2,
-              },
-              interactiveMessage: proto.Message.InteractiveMessage.create({
-                body: proto.Message.InteractiveMessage.Body.create({
-                  text,
-                }),
-                footer: proto.Message.InteractiveMessage.Footer.create({
-                  text: `© ${META_DATA.BotName} 2024`,
-                }),
-                header: proto.Message.InteractiveMessage.Header.create({
-                  title: "",
-                  subtitle: "Cat is Love",
-                  hasMediaAttachment: false,
-                }),
-                nativeFlowMessage:
-                  proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                    buttons: [
-                      {
-                        name: "quick_reply",
-                        buttonParamsJson: `{"display_text":${text2},"id":${text3}}`,
-                      },
-                    ],
-                  }),
-              }),
-            },
-          },
-        },
-        {},
-      );
-
-      await this.relayMessage(
-        from,
-        msg.message,
-        {
-          messageId: msg.key.id,
-        },
-        { quoted: m },
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
-  };
-
-  sendButton = async (from, text, button = [], m) => {
-    try {
-      let msg = generateWAMessageFromContent(
-        from,
-        {
-          viewOnceMessage: {
-            message: {
-              messageContextInfo: {
-                deviceListMetadata: {},
-                deviceListMetadataVersion: 2,
-              },
-              interactiveMessage: proto.Message.InteractiveMessage.create({
-                body: proto.Message.InteractiveMessage.Body.create({
-                  text,
-                }),
-                footer: proto.Message.InteractiveMessage.Footer.create({
-                  text: `© ${META_DATA.BotName} 2024`,
-                }),
-                header: proto.Message.InteractiveMessage.Header.create({
-                  title: "",
-                  subtitle: "Cat is Love",
-                  hasMediaAttachment: false,
-                }),
-                nativeFlowMessage:
-                  proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                    buttons: [...button],
-                  }),
-              }),
-            },
-          },
-        },
-        {},
-      );
-
-      await this.relayMessage(
-        from,
-        msg.message,
-        {
-          messageId: msg.key.id,
-        },
-        { quoted: m },
-      );
     } catch (error) {
       throw new Error(error);
     }

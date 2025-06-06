@@ -29,7 +29,7 @@ export default {
         );
       }
       let cmdData = Neko.commands.get(cmdName);
-      let cmdDesc = cmdData?.desc || "No Description";
+      let cmdDesc = cmdData?.description || "No Description";
       let cmdUsage = cmdData?.usage || "No Usage";
       let cmdName1 = cmdData?.name || "No Name";
       let cmdCategory = cmdData?.category || "No Category";

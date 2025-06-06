@@ -98,7 +98,7 @@ const savetube = {
         `https://${cdn}${savetube.api.info}`,
         {
           url: `https://www.youtube.com/watch?v=${id}`,
-        }
+        },
       );
 
       const decrypted = await savetube.crypto.decrypt(result.data.data);
@@ -110,7 +110,7 @@ const savetube = {
           downloadType: "audio",
           quality: "128",
           key: decrypted.key,
-        }
+        },
       );
 
       const { downloadUrl } = dl.data.data;
@@ -123,12 +123,11 @@ const savetube = {
       return {
         status: true,
         code: 200,
-          type: "audio",
-          format: "mp3",
-          thumbnail:
-            decrypted.thumbnail || `https://i.ytimg.com/vi/${id}/0.jpg`,
-          audio: Buffer.from(mp3Buffer),
-          quality: "128",
+        type: "audio",
+        format: "mp3",
+        thumbnail: decrypted.thumbnail || `https://i.ytimg.com/vi/${id}/0.jpg`,
+        audio: Buffer.from(mp3Buffer),
+        quality: "128",
       };
     } catch (error) {
       return {
@@ -165,7 +164,7 @@ const savetube = {
         `https://${cdn}${savetube.api.info}`,
         {
           url: `https://www.youtube.com/watch?v=${id}`,
-        }
+        },
       );
 
       const decrypted = await savetube.crypto.decrypt(result.data.data);
@@ -177,7 +176,7 @@ const savetube = {
           downloadType: "video",
           quality: "360p", // Can be changed to "720", "1080", etc.
           key: decrypted.key,
-        }
+        },
       );
 
       const { downloadUrl } = dl.data.data;
@@ -190,12 +189,11 @@ const savetube = {
       return {
         status: true,
         code: 200,
-          type: "video",
-          format: "mp4",
-          thumbnail:
-            decrypted.thumbnail || `https://i.ytimg.com/vi/${id}/0.jpg`,
-          video: Buffer.from(mp4Buffer),
-          quality: "360",
+        type: "video",
+        format: "mp4",
+        thumbnail: decrypted.thumbnail || `https://i.ytimg.com/vi/${id}/0.jpg`,
+        video: Buffer.from(mp4Buffer),
+        quality: "360",
       };
     } catch (error) {
       return {

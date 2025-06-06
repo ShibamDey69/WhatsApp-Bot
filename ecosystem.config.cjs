@@ -10,9 +10,10 @@ module.exports = {
       env: {
         NODE_ENV: "development",
         SESSION_ID: "SHIBAM",
-        PHONE_NUMBER: "1234567890", // Replace with your phone number
-        PREFIX: "!"
-      }
-    }
-  ]
+        PHONE_NUMBER: "917047584741", // Replace with your phone number
+        PREFIX: "!",
+        OWNER_NUMBER: "917047584741", // Replace with your WhatsApp number
+      },
+    },
+  ],
 };
