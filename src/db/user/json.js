@@ -1,5 +1,5 @@
 import path, { join } from "path"
-import fs from "fs-extra"
+import { promises as fs } from "fs"
 import { LRUCache } from "lru-cache"
 
 const __dirname = path.resolve()
@@ -12,17 +12,19 @@ const userCache = new LRUCache({
 
 class UserDBFunc {
   constructor() {
-    fs.ensureFileSync(userFilePath) // Ensures file exists
-    this.#initializeFile()
+    this.#ensureFile()
   }
 
-  async #initializeFile() {
+  async #ensureFile() {
     try {
-      const stats = await fs.stat(userFilePath)
-      if (stats.size === 0) await fs.writeFile(userFilePath, JSON.stringify({}))
+      await fs.mkdir(join(__dirname, "src/tmp"), { recursive: true })
+      await fs.access(userFilePath)
     } catch {
       await fs.writeFile(userFilePath, JSON.stringify({}))
     }
+
+    const stats = await fs.stat(userFilePath)
+    if (stats.size === 0) await fs.writeFile(userFilePath, JSON.stringify({}))
   }
 
   #getId(Sender) {
