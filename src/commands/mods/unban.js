@@ -17,8 +17,8 @@ export default {
       let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
 
       if (M.isGroup) {
-        let gc = await Neko.gc_db.getGroup(M.from);
-        let usr = user ? await Neko.user_db.getUser(user) : null;
+        let gc = await Neko.groupDB.getGroup(M.from);
+        let usr = user ? await Neko.userDB.getUser(user) : null;
 
         // Check if the group is banned
         if (!gc.isBanned && !usr) {
@@ -33,15 +33,15 @@ export default {
         if (user && usr && !usr.isBanned) {
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.user_id.split("@")[0]}* is not banned.`,
-            [usr.user_id],
+            `This user *@${usr.userid.split("@")[0]}* is not banned.`,
+            [usr.userid],
             M,
           );
         }
 
         // Unban the group if no user is mentioned or quoted
         if (!user) {
-          await Neko.gc_db.setGcBanned(M.from, false);
+          await Neko.groupDB.setGcBanned(M.from, false);
           return Neko.sendTextMessage(
             M.from,
             `This group *${M.groupMeta.subject}* has been unbanned.`,
@@ -51,25 +51,25 @@ export default {
 
         // Unban the mentioned or quoted user
         if (usr.isBanned) {
-          await Neko.user_db.setBanned(usr.user_id, false);
+          await Neko.userDB.setBanned(usr.userid, false);
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.user_id.split("@")[0]}* has been unbanned.`,
-            [usr.user_id],
+            `This user *@${usr.userid.split("@")[0]}* has been unbanned.`,
+            [usr.userid],
             M,
           );
         } else {
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.user_id.split("@")[0]}* is not banned.`,
-            [usr.user_id],
+            `This user *@${usr.userid.split("@")[0]}* is not banned.`,
+            [usr.userid],
             M,
           );
         }
       } else {
         // Direct message context: Unban the user
         if (user) {
-          let usr = await Neko.user_db.getUser(user.split("@")[0]);
+          let usr = await Neko.userDB.getUser(user.split("@")[0]);
 
           if (!usr.isBanned) {
             return Neko.sendMentionMessage(
@@ -79,7 +79,7 @@ export default {
               M,
             );
           } else {
-            await Neko.user_db.setBanned(user.split("@")[0], false);
+            await Neko.userDB.setBanned(user.split("@")[0], false);
             return Neko.sendMentionMessage(
               M.from,
               `User *@${user.split("@")[0]}* has been unbanned.`,

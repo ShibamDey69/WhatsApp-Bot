@@ -34,7 +34,7 @@ export default {
 
       let isStatus = status === "true";
       let userId = user.split("@")[0];
-      let usr = await Neko.user_db.getUser(userId);
+      let usr = await Neko.userDB.getUser(userId);
       if (usr.isStatus === isStatus) {
         return Neko.sendMentionMessage(
           M.from,
@@ -44,7 +44,7 @@ export default {
         );
       }
 
-      await Neko.user_db.setStatusView(userId, isStatus);
+      await Neko.userDB.setStatusView(userId, isStatus);
       let action = isStatus ? "granted" : "revoked";
       return Neko.sendMentionMessage(
         M.from,

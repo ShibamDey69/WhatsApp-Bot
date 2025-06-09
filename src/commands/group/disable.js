@@ -14,7 +14,7 @@ export default {
   run: async (Neko, M) => {
     try {
       let args = M.args.trim().toLowerCase();
-      let gc = await Neko.gc_db.getGroup(M.from, M.groupMeta?.subject);
+      let gc = await Neko.groupDB.getGroup(M.from, M.groupMeta?.subject);
       switch (args) {
         case "antilink":
         case "antilinkgc":
@@ -26,13 +26,13 @@ export default {
               M,
             );
           }
-          await Neko.gc_db.setGcAntilink(M.from, false);
+          await Neko.groupDB.setGcAntilink(M.from, false);
           await Neko.sendTextMessage(M.from, "*Antilink has been disabled*", M);
           break;
         case "welcome":
         case "welcomegc":
         case "welcomegroup":
-          await Neko.gc_db.setGcWelcome(M.from, false);
+          await Neko.groupDB.setGcWelcome(M.from, false);
           await Neko.sendTextMessage(M.from, "*Welcome has been disabled*", M);
           break;
         case "reassign":
@@ -45,7 +45,7 @@ export default {
               M,
             );
           }
-          await Neko.gc_db.setGcReassign(M.from, false);
+          await Neko.groupDB.setGcReassign(M.from, false);
           await Neko.sendTextMessage(M.from, "*Reassign has been disabled*", M);
           break;
         case "nsfw":
@@ -58,7 +58,7 @@ export default {
               M,
             );
           }
-          await Neko.gc_db.setGcNsfw(M.from, false);
+          await Neko.groupDB.setGcNsfw(M.from, false);
           await Neko.sendTextMessage(M.from, "*NSFW has been disabled*", M);
           break;
         case "antinsfw":
@@ -70,7 +70,7 @@ export default {
               M,
             );
           }
-          await Neko.gc_db.setGcAntiNsfw(M.from, false);
+          await Neko.groupDB.setGcAntiNsfw(M.from, false);
           await Neko.sendTextMessage(
             M.from,
             "*Anti-NSFW has been disabled*",

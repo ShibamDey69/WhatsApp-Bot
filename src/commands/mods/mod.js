@@ -34,7 +34,7 @@ export default {
 
       let isMod = status === "true";
       let userId = user.split("@")[0];
-      let usr = await Neko.user_db.getUser(userId);
+      let usr = await Neko.userDB.getUser(userId);
       if (usr.isMod === isMod) {
         return Neko.sendMentionMessage(
           M.from,
@@ -45,8 +45,8 @@ export default {
       }
 
       // Update the user's mod status
-      await Neko.user_db.setMod(userId, isMod);
-      await Neko.user_db.setPro(userId, isMod);
+      await Neko.userDB.setMod(userId, isMod);
+      await Neko.userDB.setPro(userId, isMod);
       let action = isMod ? "promoted to" : "demoted from";
       return Neko.sendMentionMessage(
         M.from,

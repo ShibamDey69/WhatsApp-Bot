@@ -13,7 +13,7 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      const user = await Neko.user_db.getUser(M.sender);
+      const user = await Neko.userDB.getUser(M.sender);
       if (!user.partner) {
         return await Neko.sendMentionMessage(
           M.from,

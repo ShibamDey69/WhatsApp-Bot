@@ -27,14 +27,14 @@ export default {
           M,
         );
 
-      let sender = await Neko.user_db.getUser(M.sender.split("@")[0]);
-      let receiver = await Neko.user_db.getUser(user.split("@")[0]);
+      let sender = await Neko.userDB.getUser(M.sender.split("@")[0]);
+      let receiver = await Neko.userDB.getUser(user.split("@")[0]);
 
       if (action === "accept") {
         if (
-          !sender?.proposal?.includes(receiver.user_id) ||
+          !sender?.proposal?.includes(receiver.userid) ||
           !sender.isMarried ||
-          sender.partner !== receiver.user_id
+          sender.partner !== receiver.userid
         ) {
           let ErrorMess = getErrorMessage(sender, receiver);
           return await Neko.sendMentionMessage(
@@ -44,8 +44,8 @@ export default {
             M,
           );
         }
-        await Neko.user_db.setMarried(M.sender, undefined, false);
-        await Neko.user_db.setMarried(user, undefined, false);
+        await Neko.userDB.setMarried(M.sender, undefined, false);
+        await Neko.userDB.setMarried(user, undefined, false);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* and *@${user.split("@")[0]}* are now divorced.`,
@@ -53,14 +53,14 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!sender.proposal?.includes(receiver.user_id))
+        if (!sender.proposal?.includes(receiver.userid))
           return Neko.sendTextMessage(
             M.from,
             "No divorce request found from this user.",
             M,
           );
 
-        await Neko.user_db.rejectProposal(M.sender, user);
+        await Neko.userDB.rejectProposal(M.sender, user);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* has rejected the divorce proposal from *@${user.split("@")[0]}*`,
@@ -70,8 +70,8 @@ export default {
       } else {
         if (
           !sender.isMarried ||
-          sender.partner !== receiver.user_id ||
-          sender.proposal?.includes(receiver.user_id)
+          sender.partner !== receiver.userid ||
+          sender.proposal?.includes(receiver.userid)
         ) {
           let ErrorMess = getErrorMessage(sender, receiver);
           return await Neko.sendMentionMessage(
@@ -82,7 +82,7 @@ export default {
           );
         }
 
-        await Neko.user_db.addProposal(user, M.sender);
+        await Neko.userDB.addProposal(user, M.sender);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* has sent a divorce request to *@${user.split("@")[0]}*`,
@@ -100,18 +100,18 @@ const getErrorMessage = (sender, receiver) => {
   if (!sender) return { text: "User not found in the database.", mention: [] };
   if (!receiver)
     return { text: "Mentioned user not found in the database.", mention: [] };
-  if (!sender.isMarried || sender.partner !== receiver.user_id)
+  if (!sender.isMarried || sender.partner !== receiver.userid)
     return {
-      text: `You are not married to *@${receiver.user_id.split("@")[0]}*`,
-      mention: [receiver.user_id],
+      text: `You are not married to *@${receiver.userid.split("@")[0]}*`,
+      mention: [receiver.userid],
     };
-  if (sender?.proposal?.includes(receiver.user_id))
+  if (sender?.proposal?.includes(receiver.userid))
     return {
-      text: `*@${sender.user_id.split("@")[0]}* has already sent a divorce request to *@${receiver.user_id.split("@")[0]}*`,
-      mention: [sender.user_id, receiver.user_id],
+      text: `*@${sender.userid.split("@")[0]}* has already sent a divorce request to *@${receiver.userid.split("@")[0]}*`,
+      mention: [sender.userid, receiver.userid],
     };
   return {
     text: "No divorce request found from this user.",
-    mention: [sender.user_id],
+    mention: [sender.userid],
   };
 };

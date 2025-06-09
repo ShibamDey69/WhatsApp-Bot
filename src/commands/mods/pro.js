@@ -34,7 +34,7 @@ export default {
 
       let isPro = status === "true";
       let userId = user.split("@")[0];
-      let usr = await Neko.user_db.getUser(userId);
+      let usr = await Neko.userDB.getUser(userId);
       if (usr.isPro === isPro) {
         return Neko.sendMentionMessage(
           M.from,
@@ -45,7 +45,7 @@ export default {
       }
 
       // Update the user's pro status
-      await Neko.user_db.setPro(userId, isPro);
+      await Neko.userDB.setPro(userId, isPro);
       let action = isPro ? "promoted to" : "demoted from";
       return Neko.sendMentionMessage(
         M.from,

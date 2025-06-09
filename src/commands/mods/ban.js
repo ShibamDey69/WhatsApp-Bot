@@ -17,8 +17,8 @@ export default {
       let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
 
       if (M.isGroup) {
-        let gc = await Neko.gc_db.getGroup(M.from);
-        let usr = user ? await Neko.user_db.getUser(user) : null;
+        let gc = await Neko.groupDB.getGroup(M.from);
+        let usr = user ? await Neko.userDB.getUser(user) : null;
 
         // Check if the group is already banned
         if (gc.isBanned) {
@@ -33,15 +33,15 @@ export default {
         if (user && usr && usr.isBanned && !usr.isMod) {
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.user_id.split("@")[0]}* is already banned from using this bot.`,
-            [usr.user_id],
+            `This user *@${usr.userid.split("@")[0]}* is already banned from using this bot.`,
+            [usr.userid],
             M,
           );
         }
 
         // Ban the group if no user is mentioned or quoted
         if (!user) {
-          await Neko.gc_db.setGcBanned(M.from, true);
+          await Neko.groupDB.setGcBanned(M.from, true);
           return Neko.sendTextMessage(
             M.from,
             `This group *${M.groupMeta.subject}* has been banned.`,
@@ -51,25 +51,25 @@ export default {
 
         // Ban the mentioned or quoted user if they are not a mod
         if (!usr.isMod) {
-          await Neko.user_db.setBanned(usr.user_id, true);
+          await Neko.userDB.setBanned(usr.userid, true);
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.user_id.split("@")[0]}* has been banned.`,
-            [usr.user_id],
+            `This user *@${usr.userid.split("@")[0]}* has been banned.`,
+            [usr.userid],
             M,
           );
         } else {
           return Neko.sendMentionMessage(
             M.from,
-            `You can't ban *@${usr.user_id.split("@")[0]}* because they are a *Mod*.`,
-            [usr.user_id],
+            `You can't ban *@${usr.userid.split("@")[0]}* because they are a *Mod*.`,
+            [usr.userid],
             M,
           );
         }
       } else {
         // Direct message context: Ban the user if they are not a mod
         if (user) {
-          let usr = await Neko.user_db.getUser(user.split("@")[0]);
+          let usr = await Neko.userDB.getUser(user.split("@")[0]);
 
           if (usr.isMod) {
             return Neko.sendMentionMessage(
@@ -79,7 +79,7 @@ export default {
               M,
             );
           } else {
-            await Neko.user_db.setBanned(user.split("@")[0], true);
+            await Neko.userDB.setBanned(user.split("@")[0], true);
             return Neko.sendMentionMessage(
               M.from,
               `User *@${user.split("@")[0]}* has been banned.`,

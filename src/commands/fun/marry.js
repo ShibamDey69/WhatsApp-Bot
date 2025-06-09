@@ -27,12 +27,12 @@ export default {
           M,
         );
 
-      let sender = await Neko.user_db.getUser(M.sender.split("@")[0]);
-      let receiver = await Neko.user_db.getUser(user.split("@")[0]);
+      let sender = await Neko.userDB.getUser(M.sender.split("@")[0]);
+      let receiver = await Neko.userDB.getUser(user.split("@")[0]);
 
       if (action === "accept") {
         if (
-          !sender?.proposal?.includes(receiver.user_id) ||
+          !sender?.proposal?.includes(receiver.userid) ||
           sender.isMarried ||
           receiver.isMarried
         ) {
@@ -44,8 +44,8 @@ export default {
             M,
           );
         }
-        await Neko.user_db.setMarried(M.sender, user, true);
-        await Neko.user_db.setMarried(user, M.sender, true);
+        await Neko.userDB.setMarried(M.sender, user, true);
+        await Neko.userDB.setMarried(user, M.sender, true);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* and *@${user.split("@")[0]}* are now married!`,
@@ -53,14 +53,14 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!sender.proposal?.includes(receiver.user_id))
+        if (!sender.proposal?.includes(receiver.userid))
           return Neko.sendTextMessage(
             M.from,
             "No marriage request found from this user.",
             M,
           );
 
-        await Neko.user_db.rejectProposal(M.sender, user);
+        await Neko.userDB.rejectProposal(M.sender, user);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* has rejected the marriage proposal from *@${user.split("@")[0]}*`,
@@ -69,11 +69,11 @@ export default {
         );
       } else {
         if (
-          sender.partner === receiver.user_id ||
-          sender.user_id === receiver.user_id ||
+          sender.partner === receiver.userid ||
+          sender.userid === receiver.userid ||
           sender.isMarried ||
           receiver.isMarried ||
-          sender.proposal?.includes(receiver.user_id)
+          sender.proposal?.includes(receiver.userid)
         ) {
           let ErrorMess = getErrorMessage(sender, receiver);
           return Neko.sendMentionMessage(
@@ -84,7 +84,7 @@ export default {
           );
         }
 
-        await Neko.user_db.addProposal(user, M.sender);
+        await Neko.userDB.addProposal(user, M.sender);
         return Neko.sendMentionMessage(
           M.from,
           `*@${M.sender.split("@")[0]}* has sent a marriage request to *@${user.split("@")[0]}*`,
@@ -99,15 +99,15 @@ export default {
 };
 
 const getErrorMessage = (sender, receiver) => {
-  if (sender.partner === receiver.user_id)
+  if (sender.partner === receiver.userid)
     return {
-      text: `*@${sender.user_id.split("@")[0]}* is already married to *@${receiver.user_id.split("@")[0]}*`,
-      mention: [sender.user_id, receiver.user_id],
+      text: `*@${sender.userid.split("@")[0]}* is already married to *@${receiver.userid.split("@")[0]}*`,
+      mention: [sender.userid, receiver.userid],
     };
-  else if (sender.user_id === receiver.user_id)
+  else if (sender.userid === receiver.userid)
     return {
-      text: `*@${sender.user_id.split("@")[0]}* can't marry himself...`,
-      mention: [sender.user_id],
+      text: `*@${sender.userid.split("@")[0]}* can't marry himself...`,
+      mention: [sender.userid],
     };
   else if (sender.isMarried)
     return {
@@ -116,17 +116,17 @@ const getErrorMessage = (sender, receiver) => {
     };
   else if (receiver.isMarried)
     return {
-      text: `Sorry You are quite late😔 *@${receiver.user_id.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
-      mention: [receiver.user_id, receiver.partner],
+      text: `Sorry You are quite late😔 *@${receiver.userid.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
+      mention: [receiver.userid, receiver.partner],
     };
-  else if (sender?.proposal?.includes(receiver.user_id))
+  else if (sender?.proposal?.includes(receiver.userid))
     return {
-      text: `*@${sender.user_id.split("@")[0]}* has already sent a marriage proposal to *@${receiver.user_id.split("@")[0]}*`,
-      mention: [sender.user_id, receiver.user_id],
+      text: `*@${sender.userid.split("@")[0]}* has already sent a marriage proposal to *@${receiver.userid.split("@")[0]}*`,
+      mention: [sender.userid, receiver.userid],
     };
   else
     return {
       text: "No marriage request found from this user.",
-      mention: [sender.user_id],
+      mention: [sender.userid],
     };
 };

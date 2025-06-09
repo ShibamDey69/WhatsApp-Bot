@@ -25,7 +25,7 @@ export default {
 
       switch (mode) {
         case "private":
-          await Neko.gc_db.setGcMode(M.from, mode);
+          await Neko.groupDB.setGcMode(M.from, mode);
           await Neko.sendTextMessage(
             M.from,
             `Group mode has been set to ${mode}.`,
@@ -33,7 +33,7 @@ export default {
           );
           break;
         case "public":
-          await Neko.gc_db.setGcMode(M.from, mode);
+          await Neko.groupDB.setGcMode(M.from, mode);
           await Neko.sendTextMessage(
             M.from,
             `Group mode has been set to ${mode}.`,
@@ -41,7 +41,7 @@ export default {
           );
           break;
         case "admin":
-          await Neko.gc_db.setGcMode(M.from, mode);
+          await Neko.groupDB.setGcMode(M.from, mode);
           await Neko.sendTextMessage(
             M.from,
             `Group mode has been set to ${mode}.`,

@@ -1,8 +1,5 @@
-import fs from "fs";
 import retry from "retry";
-import sequelizer from "../utils/sequelized.js";
-import DB from "../connect/db.js";
-// Define the retry function
+
 const groupHandler = async (Neko, m) => {
   let response = {
     welcome: [
@@ -65,8 +62,8 @@ const groupHandler = async (Neko, m) => {
   operation.attempt(async (currentAttempt) => {
     try {
       if (!m || !m.id || !m.action || !m.participants) return;
-      let gc_db = new DB.GroupDbFunc();
-      const gc = await gc_db.getGroup(m.id);
+      if (!m.id.endsWith("@g.us")) return;
+      const gc = await Neko.groupDB.getGroup(m.id);
       if (gc && m.author && m.author.includes("@s.whatsapp.net")) {
         switch (m.action) {
           case "promote":

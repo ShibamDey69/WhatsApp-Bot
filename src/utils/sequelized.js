@@ -2,14 +2,14 @@ import { getContentType } from "@whiskeysockets/baileys";
 
 const fetchUserData = async (Neko, id, filter, pushName) => {
   if (!id) return null;
-  const user = await Neko.user_db.getUser(id, pushName);
+  const user = await Neko.userDB.getUser(id, pushName);
   if (user) return user[filter];
   return null;
 };
 
 const fetchGroupData = async (Neko, id, filter, gcName) => {
   if (!id) return null;
-  const group = await Neko.gc_db.getGroup(id, gcName);
+  const group = await Neko.groupDB.getGroup(id, gcName);
   if (group) return group[filter];
   return null;
 };

@@ -23,7 +23,7 @@ export default {
         );
       }
       let isFriendAI = status === "true";
-      let gc = await Neko.gc_db.getGroup(M.from);
+      let gc = await Neko.groupDB.getGroup(M.from);
       if (gc.isChatAi && isFriendAI) {
         return Neko.sendTextMessage(
           M.from,
@@ -39,14 +39,14 @@ export default {
         );
       }
       if (isFriendAI) {
-        await Neko.gc_db.setGcChatAi(M.from, true);
+        await Neko.groupDB.setGcChatAi(M.from, true);
         return await Neko.sendTextMessage(
           M.from,
           "AI friend has been enabled.",
           M,
         );
       } else {
-        await Neko.gc_db.setGcChatAi(M.from, false);
+        await Neko.groupDB.setGcChatAi(M.from, false);
         return await Neko.sendTextMessage(
           M.from,
           "AI friend has been disabled.",

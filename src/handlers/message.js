@@ -99,10 +99,10 @@ const messageHandler = async (Neko, m) => {
         if (M.quoted.sender || M.mention[0]) {
           if (M.mention) {
             M.mention.forEach(async (mention) => {
-              await Neko.user_db.getUser(mention, M.pushName);
+              await Neko.userDB.getUser(mention, M.pushName);
             });
           } else {
-            await Neko.user_db.getUser(M.quoted.sender, M.pushName);
+            await Neko.userDB.getUser(M.quoted.sender, M.pushName);
           }
         }
 

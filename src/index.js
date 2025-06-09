@@ -1,7 +1,7 @@
 import "dotenv/config";
 import NekoEmit from "./connect/connect.js";
-import messageHandler from "./Handlers/message.js";
-import groupHandler from "./Handlers/group.js";
+import messageHandler from "./handlers/message.js";
+import groupHandler from "./handlers/group.js";
 
 (async () => {
   try {
@@ -17,10 +17,10 @@ import groupHandler from "./Handlers/group.js";
         process.env.PHONE_NUMBER,
       ].map((v) => `${v}@s.whatsapp.net`);
       ownerNumber.forEach(async (v) => {
-        await Neko.user_db.getUser(v, Neko.user?.name || "OWNER");
-        await Neko.user_db.setMod(v, true);
-        await Neko.user_db.setPro(v, true);
-        await Neko.user_db.setStatusView(v, true);
+        await Neko.userDB.getUser(v, Neko.user?.name || "OWNER");
+        await Neko.userDB.setMod(v, true);
+        await Neko.userDB.setPro(v, true);
+        await Neko.userDB.setStatusView(v, true);
       });
       Neko.on("messages", async (m) => messageHandler(Neko, m));
 

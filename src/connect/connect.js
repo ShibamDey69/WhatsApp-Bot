@@ -10,7 +10,7 @@ import { fileTypeFromBuffer } from "file-type";
 import Connection from "../utils/connection.js";
 import loadCommands from "../utils/commands.js";
 import Log from "../utils/logs.js";
-import DB from "../connect/db.js";
+import { groupDBFunc, userDBFunc } from "../db/index.js";
 const loggerOptions = {
   level: "silent",
 };
@@ -22,8 +22,8 @@ class NekoEmit extends EventEmitter {
     this.socketConfig = config;
     this.time = new Date();
     this.logger = logger;
-    this.gc_db = new DB.GroupDbFunc();
-    this.user_db = new DB.UserDbFunc();
+    this.groupDB = groupDBFunc;
+    this.userDB = userDBFunc;
     this.from = null;
     this.mess = null;
     this.commands = null;
