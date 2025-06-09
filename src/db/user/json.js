@@ -1,53 +1,70 @@
-import path, { join } from "path";
-import fs from "fs-extra";
-import { LRUCache } from "lru-cache";
+import path, { join } from "path"
+import fs from "fs-extra"
+import { LRUCache } from "lru-cache"
 
-const __dirname = path.resolve();
-const userFilePath = join(__dirname, "src/tmp", "user.json");
+const __dirname = path.resolve()
+const userFilePath = join(__dirname, "src/tmp", "user.json")
 
-// Setup cache
 const userCache = new LRUCache({
   max: 500,
   ttl: 1000 * 60 * 10, // 10 minutes
-});
+})
 
-class userDBFunc {
+class UserDBFunc {
   constructor() {
-    if (!fs.existsSync(userFilePath)) {
-      fs.writeFileSync(userFilePath, JSON.stringify({}));
+    fs.ensureFileSync(userFilePath) // Ensures file exists
+    this.#initializeFile()
+  }
+
+  async #initializeFile() {
+    try {
+      const stats = await fs.stat(userFilePath)
+      if (stats.size === 0) await fs.writeFile(userFilePath, JSON.stringify({}))
+    } catch {
+      await fs.writeFile(userFilePath, JSON.stringify({}))
     }
   }
 
   #getId(Sender) {
-    return Sender.replace("@s.whatsapp.net", "");
+    return Sender.replace("@s.whatsapp.net", "")
   }
 
   async #loadUsers() {
-    return JSON.parse(await fs.readFile(userFilePath));
+    try {
+      const content = await fs.readFile(userFilePath, "utf-8")
+      return JSON.parse(content)
+    } catch (err) {
+      console.error("Error reading user.json:", err)
+      return {}
+    }
   }
 
   async #saveUsers(users) {
-    await fs.writeFile(userFilePath, JSON.stringify(users, null, 2));
+    try {
+      await fs.writeFile(userFilePath, JSON.stringify(users, null, 2))
+    } catch (err) {
+      console.error("Error writing user.json:", err)
+    }
   }
 
   async #updateUserProp(Sender, updates) {
-    if (Sender.endsWith("@g.us")) return;
-    const id = this.#getId(Sender);
-    const users = await this.#loadUsers();
-    if (!users[id]) throw new Error("User not found");
-    Object.assign(users[id], updates);
-    await this.#saveUsers(users);
-    userCache.set(id, users[id]); // Update cache
+    if (Sender.endsWith("@g.us")) return
+    const id = this.#getId(Sender)
+    const users = await this.#loadUsers()
+    if (!users[id]) throw new Error("User not found")
+
+    Object.assign(users[id], updates)
+    await this.#saveUsers(users)
+    userCache.set(id, users[id])
   }
 
   async getUser(Sender, name) {
-    if (Sender.endsWith("@g.us")) return;
-    const id = this.#getId(Sender);
+    if (Sender.endsWith("@g.us")) return
+    const id = this.#getId(Sender)
 
-    // 🔁 Check cache first
-    if (userCache.has(id)) return userCache.get(id);
+    if (userCache.has(id)) return userCache.get(id)
 
-    const users = await this.#loadUsers();
+    const users = await this.#loadUsers()
 
     if (!users[id]) {
       const newUser = {
@@ -61,40 +78,44 @@ class userDBFunc {
         isStatusView: false,
         proposal: [],
         createdAt: Date.now(),
-      };
-      await this.setUser(id, newUser);
-      userCache.set(id, newUser); // Add to cache
-      return newUser;
+      }
+      users[id] = newUser
+      await this.#saveUsers(users)
+      userCache.set(id, newUser)
+      return newUser
     }
 
-    userCache.set(id, users[id]); // Cache existing
-    return users[id];
+    userCache.set(id, users[id])
+    return users[id]
   }
 
   async filterUser(key, value) {
-    const users = await this.#loadUsers();
-    return Object.values(users).filter((user) => user[key] === value);
+    const users = await this.#loadUsers()
+    return Object.values(users).filter(user => user[key] === value)
   }
 
   async setUser(userId, data) {
-    const users = await this.#loadUsers();
-    users[userId] = data;
-    await this.#saveUsers(users);
-    userCache.set(userId, data); // Update cache
-    return data;
+    const users = await this.#loadUsers()
+    users[userId] = data
+    await this.#saveUsers(users)
+    userCache.set(userId, data)
+    return data
   }
 
   async setPro(Sender, state = true) {
-    await this.#updateUserProp(Sender, { isPro: state });
+    await this.#updateUserProp(Sender, { isPro: state })
   }
+
   async setBanned(Sender, state = true) {
-    await this.#updateUserProp(Sender, { isBanned: state });
+    await this.#updateUserProp(Sender, { isBanned: state })
   }
+
   async setMod(Sender, state = true) {
-    await this.#updateUserProp(Sender, { isMod: state });
+    await this.#updateUserProp(Sender, { isMod: state })
   }
+
   async setStatusView(Sender, state = true) {
-    await this.#updateUserProp(Sender, { isStatusView: state });
+    await this.#updateUserProp(Sender, { isStatusView: state })
   }
 
   async setMarried(Sender, partner, state = true) {
@@ -102,28 +123,33 @@ class userDBFunc {
       isMarried: state,
       partner,
       proposal: [],
-    });
+    })
   }
 
   async addProposal(Sender, partner) {
-    if (Sender.endsWith("@g.us")) return;
-    const id = this.#getId(Sender);
-    const users = await this.#loadUsers();
-    if (!users[id]) throw new Error("User not found");
-    users[id].proposal.push(partner);
-    await this.#saveUsers(users);
-    userCache.set(id, users[id]); // Update cache
+    if (Sender.endsWith("@g.us")) return
+    const id = this.#getId(Sender)
+    const users = await this.#loadUsers()
+    if (!users[id]) throw new Error("User not found")
+
+    if (!users[id].proposal.includes(partner)) {
+      users[id].proposal.push(partner)
+    }
+
+    await this.#saveUsers(users)
+    userCache.set(id, users[id])
   }
 
   async rejectProposal(Sender, partner) {
-    if (Sender.endsWith("@g.us")) return;
-    const id = this.#getId(Sender);
-    const users = await this.#loadUsers();
-    if (!users[id]) throw new Error("User not found");
-    users[id].proposal = users[id].proposal.filter((p) => p !== partner);
-    await this.#saveUsers(users);
-    userCache.set(id, users[id]); // Update cache
+    if (Sender.endsWith("@g.us")) return
+    const id = this.#getId(Sender)
+    const users = await this.#loadUsers()
+    if (!users[id]) throw new Error("User not found")
+
+    users[id].proposal = users[id].proposal.filter(p => p !== partner)
+    await this.#saveUsers(users)
+    userCache.set(id, users[id])
   }
 }
 
-export default userDBFunc;
+export default UserDBFunc

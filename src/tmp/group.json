@@ -167,5 +167,18 @@
     "isAntiNsfw": false,
     "isChatAi": false,
     "createdAt": 1749454821835
+  },
+  "120363198869611273": {
+    "groupId": "120363198869611273@g.us",
+    "name": "rawrr 🥺👉🏻👈🏻",
+    "mode": "private",
+    "isBanned": false,
+    "isAntilink": false,
+    "isWelcome": false,
+    "isReassign": false,
+    "isNsfw": false,
+    "isAntiNsfw": false,
+    "isChatAi": false,
+    "createdAt": 1749457107563
   }
 }
