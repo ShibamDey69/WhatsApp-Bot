@@ -32,7 +32,7 @@ export default {
 
       if (action === "accept") {
         if (
-          !sender?.proposal?.includes(receiver.userid) ||
+          !sender?.proposal?.includes(receiver.userId) ||
           sender.isMarried ||
           receiver.isMarried
         ) {
@@ -53,7 +53,7 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!sender.proposal?.includes(receiver.userid))
+        if (!sender.proposal?.includes(receiver.userId))
           return Neko.sendTextMessage(
             M.from,
             "No marriage request found from this user.",
@@ -69,11 +69,11 @@ export default {
         );
       } else {
         if (
-          sender.partner === receiver.userid ||
-          sender.userid === receiver.userid ||
+          sender.partner === receiver.userId ||
+          sender.userId === receiver.userId ||
           sender.isMarried ||
           receiver.isMarried ||
-          sender.proposal?.includes(receiver.userid)
+          sender.proposal?.includes(receiver.userId)
         ) {
           let ErrorMess = getErrorMessage(sender, receiver);
           return Neko.sendMentionMessage(
@@ -99,15 +99,15 @@ export default {
 };
 
 const getErrorMessage = (sender, receiver) => {
-  if (sender.partner === receiver.userid)
+  if (sender.partner === receiver.userId)
     return {
-      text: `*@${sender.userid.split("@")[0]}* is already married to *@${receiver.userid.split("@")[0]}*`,
-      mention: [sender.userid, receiver.userid],
+      text: `*@${sender.userId.split("@")[0]}* is already married to *@${receiver.userId.split("@")[0]}*`,
+      mention: [sender.userId, receiver.userId],
     };
-  else if (sender.userid === receiver.userid)
+  else if (sender.userId === receiver.userId)
     return {
-      text: `*@${sender.userid.split("@")[0]}* can't marry himself...`,
-      mention: [sender.userid],
+      text: `*@${sender.userId.split("@")[0]}* can't marry himself...`,
+      mention: [sender.userId],
     };
   else if (sender.isMarried)
     return {
@@ -116,17 +116,17 @@ const getErrorMessage = (sender, receiver) => {
     };
   else if (receiver.isMarried)
     return {
-      text: `Sorry You are quite late😔 *@${receiver.userid.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
-      mention: [receiver.userid, receiver.partner],
+      text: `Sorry You are quite late😔 *@${receiver.userId.split("@")[0]}* has already fallen for *@${receiver.partner.split("@")[0]}* ♥️🌚`,
+      mention: [receiver.userId, receiver.partner],
     };
-  else if (sender?.proposal?.includes(receiver.userid))
+  else if (sender?.proposal?.includes(receiver.userId))
     return {
-      text: `*@${sender.userid.split("@")[0]}* has already sent a marriage proposal to *@${receiver.userid.split("@")[0]}*`,
-      mention: [sender.userid, receiver.userid],
+      text: `*@${sender.userId.split("@")[0]}* has already sent a marriage proposal to *@${receiver.userId.split("@")[0]}*`,
+      mention: [sender.userId, receiver.userId],
     };
   else
     return {
       text: "No marriage request found from this user.",
-      mention: [sender.userid],
+      mention: [sender.userId],
     };
 };

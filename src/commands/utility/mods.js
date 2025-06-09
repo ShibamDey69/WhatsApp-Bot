@@ -14,7 +14,7 @@ export default {
   run: async (Neko, M) => {
     try {
       let mods = await Neko.userDB.filterUser("isMod", true);
-      mods = mods.map((user) => user?.userid);
+      mods = mods.map((user) => user?.userId);
       let modsText = "_*-:All Mods:-*_\n";
       for (let i = 0; i < mods.length; i++) {
         modsText += `*${i + 1}.* @${mods[i].split("@")[0]}\n`;

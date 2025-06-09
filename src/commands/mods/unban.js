@@ -33,8 +33,8 @@ export default {
         if (user && usr && !usr.isBanned) {
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.userid.split("@")[0]}* is not banned.`,
-            [usr.userid],
+            `This user *@${usr.userId.split("@")[0]}* is not banned.`,
+            [usr.userId],
             M,
           );
         }
@@ -51,18 +51,18 @@ export default {
 
         // Unban the mentioned or quoted user
         if (usr.isBanned) {
-          await Neko.userDB.setBanned(usr.userid, false);
+          await Neko.userDB.setBanned(usr.userId, false);
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.userid.split("@")[0]}* has been unbanned.`,
-            [usr.userid],
+            `This user *@${usr.userId.split("@")[0]}* has been unbanned.`,
+            [usr.userId],
             M,
           );
         } else {
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.userid.split("@")[0]}* is not banned.`,
-            [usr.userid],
+            `This user *@${usr.userId.split("@")[0]}* is not banned.`,
+            [usr.userId],
             M,
           );
         }

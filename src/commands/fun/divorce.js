@@ -32,9 +32,9 @@ export default {
 
       if (action === "accept") {
         if (
-          !sender?.proposal?.includes(receiver.userid) ||
+          !sender?.proposal?.includes(receiver.userId) ||
           !sender.isMarried ||
-          sender.partner !== receiver.userid
+          sender.partner !== receiver.userId
         ) {
           let ErrorMess = getErrorMessage(sender, receiver);
           return await Neko.sendMentionMessage(
@@ -53,7 +53,7 @@ export default {
           M,
         );
       } else if (action === "reject") {
-        if (!sender.proposal?.includes(receiver.userid))
+        if (!sender.proposal?.includes(receiver.userId))
           return Neko.sendTextMessage(
             M.from,
             "No divorce request found from this user.",
@@ -70,8 +70,8 @@ export default {
       } else {
         if (
           !sender.isMarried ||
-          sender.partner !== receiver.userid ||
-          sender.proposal?.includes(receiver.userid)
+          sender.partner !== receiver.userId ||
+          sender.proposal?.includes(receiver.userId)
         ) {
           let ErrorMess = getErrorMessage(sender, receiver);
           return await Neko.sendMentionMessage(
@@ -100,18 +100,18 @@ const getErrorMessage = (sender, receiver) => {
   if (!sender) return { text: "User not found in the database.", mention: [] };
   if (!receiver)
     return { text: "Mentioned user not found in the database.", mention: [] };
-  if (!sender.isMarried || sender.partner !== receiver.userid)
+  if (!sender.isMarried || sender.partner !== receiver.userId)
     return {
-      text: `You are not married to *@${receiver.userid.split("@")[0]}*`,
-      mention: [receiver.userid],
+      text: `You are not married to *@${receiver.userId.split("@")[0]}*`,
+      mention: [receiver.userId],
     };
-  if (sender?.proposal?.includes(receiver.userid))
+  if (sender?.proposal?.includes(receiver.userId))
     return {
-      text: `*@${sender.userid.split("@")[0]}* has already sent a divorce request to *@${receiver.userid.split("@")[0]}*`,
-      mention: [sender.userid, receiver.userid],
+      text: `*@${sender.userId.split("@")[0]}* has already sent a divorce request to *@${receiver.userId.split("@")[0]}*`,
+      mention: [sender.userId, receiver.userId],
     };
   return {
     text: "No divorce request found from this user.",
-    mention: [sender.userid],
+    mention: [sender.userId],
   };
 };

@@ -33,8 +33,8 @@ export default {
         if (user && usr && usr.isBanned && !usr.isMod) {
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.userid.split("@")[0]}* is already banned from using this bot.`,
-            [usr.userid],
+            `This user *@${usr.userId.split("@")[0]}* is already banned from using this bot.`,
+            [usr.userId],
             M,
           );
         }
@@ -51,18 +51,18 @@ export default {
 
         // Ban the mentioned or quoted user if they are not a mod
         if (!usr.isMod) {
-          await Neko.userDB.setBanned(usr.userid, true);
+          await Neko.userDB.setBanned(usr.userId, true);
           return Neko.sendMentionMessage(
             M.from,
-            `This user *@${usr.userid.split("@")[0]}* has been banned.`,
-            [usr.userid],
+            `This user *@${usr.userId.split("@")[0]}* has been banned.`,
+            [usr.userId],
             M,
           );
         } else {
           return Neko.sendMentionMessage(
             M.from,
-            `You can't ban *@${usr.userid.split("@")[0]}* because they are a *Mod*.`,
-            [usr.userid],
+            `You can't ban *@${usr.userId.split("@")[0]}* because they are a *Mod*.`,
+            [usr.userId],
             M,
           );
         }
