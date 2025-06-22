@@ -14,6 +14,7 @@ export default {
   run: async (Neko, M) => {
     try {
       let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
+      console.log("User:", user);
       let args = M.args;
       let action = args.includes("--accept")
         ? "accept"
@@ -32,7 +33,7 @@ export default {
 
       if (action === "accept") {
         if (
-          !sender?.proposal?.includes(receiver.userId) ||
+          !sender.proposal?.includes(receiver.userId) ||
           sender.isMarried ||
           receiver.isMarried
         ) {

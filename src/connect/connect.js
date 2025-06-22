@@ -12,8 +12,16 @@ import loadCommands from "../utils/commands.js";
 import Log from "../utils/logs.js";
 import { groupDBFunc, userDBFunc } from "../db/index.js";
 const loggerOptions = {
-  level: "silent",
-};
+  level: 'silent', // Set the minimum log level
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,                 // Colorize output
+      translateTime: 'SYS:standard', // Human-readable time
+      ignore: 'pid,hostname'         // Omit pid and hostname from output
+    }
+  }
+}
 const logger = Pino(loggerOptions).child({});
 
 class NekoEmit extends EventEmitter {
