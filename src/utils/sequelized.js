@@ -28,27 +28,27 @@ const getMessageText = (message, messageType) => {
 
 const sequilizer = async (Neko, m) => {
   try {
-    if (
-      !m.key?.remoteJid ||
-      m.key?.remoteJid.includes("status@broadcast") ||
-      (!m.key?.remoteJid.includes("@s.whatsapp.net") &&
-        !m.key?.remoteJid.includes("@g.us"))
-    )
-      return;
     const messageType = getContentType(m.message);
+    const isMe = m.key?.fromMe;
     const text = getMessageText(m.message, messageType);
-    const from = m.key?.remoteJid;
+    const from = isMe
+      ? `${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`
+      : m.key?.remoteJid;
     const isGroup = from?.endsWith("@g.us");
     const quotedMessageType = getContentType(
       m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
     );
-    const isMe = m.key?.fromMe;
     const sender = isMe
       ? `${Neko?.user?.id?.split(":")[0]}@s.whatsapp.net`
       : isGroup
         ? m.key?.participant
         : from;
-
+    if (
+      !from ||
+      from.includes("status@broadcast") ||
+      (from.includes("@s.whatsapp.net") &&
+      from.includes("@g.us"))
+    ) return;
     let groupMeta = isGroup ? await Neko.groupMetadata(from) : null;
     let admins = isGroup
       ? groupMeta.participants.filter((v) => v.admin).map((v) => v.id)
@@ -139,6 +139,7 @@ const sequilizer = async (Neko, m) => {
         m.message?.[messageType]?.contextInfo?.mentionedJid?.length > 0,
       isQuoted: !!m.message?.extendedTextMessage?.contextInfo?.quotedMessage,
     };
+    
     return mUpdated;
   } catch (error) {
     console.error(error);
