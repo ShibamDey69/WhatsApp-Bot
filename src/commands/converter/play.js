@@ -42,10 +42,10 @@ export default {
 
       if (M.args.includes("--video") || M.args.includes("-v")) {
         let yt = await YT.ytmp4(url);
-        return await Neko.sendVideoMessage(M.from, yt.video, M);
+        return await Neko.sendVideoMessage(M.from, yt.buffer, M);
       } else {
         let yt = await YT.ytmp3(url);
-        return await Neko.sendAudioMessage(M.from, yt.audio, M, false);
+        return await Neko.sendAudioMessage(M.from, yt.buffer, M, false);
       }
     } catch (error) {
       await Neko.error(error);

@@ -12,18 +12,12 @@ import groupHandler from "./handlers/group.js";
 
     let connect = await Neko.connect();
     if (connect) {
-      const ownerNumber = [
-        ...process.env.OWNER_NUMBER.split(",").map((v) => v.trim()),
-        process.env.PHONE_NUMBER,
-      ].map((v) => `${v}@s.whatsapp.net`);
-      ownerNumber.forEach(async (v) => {
-        await Neko.userDB.getUser(v, Neko.user?.name || "OWNER");
-        await Neko.userDB.setMod(v, true);
-        await Neko.userDB.setPro(v, true);
-        await Neko.userDB.setStatusView(v, true);
-      });
+      await Neko.userDB.getUser(
+        `${Neko.user.lid.split(":")[0]}@lid`,
+        `${Neko.user.id.split(":")[0]}@s.whatsapp.net`,
+        Neko.user.name
+      );
       Neko.on("messages", async (m) => messageHandler(Neko, m));
-
       Neko.on("groups", async (m) => groupHandler(Neko, m));
     }
   } catch (error) {

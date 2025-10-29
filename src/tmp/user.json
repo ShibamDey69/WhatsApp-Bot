@@ -1,14 +1,93 @@
 {
-  "917047584741": {
-    "userId": "917047584741@s.whatsapp.net",
-    "username": "<ShibamDey69 />",
-    "isPro": true,
+  "272069098999891": {
+    "userId": "272069098999891@lid",
+    "senderPn": "917407706773@s.whatsapp.net",
+    "name": "Arunava Mandal",
+    "isPro": false,
     "isBanned": false,
-    "isMod": true,
+    "isMod": false,
     "isMarried": false,
     "partner": null,
-    "isStatusView": true,
+    "isStatusView": false,
     "proposal": [],
-    "createdAt": 1750618803742
+    "createdAt": 1761742844150
+  },
+  "242197786063082": {
+    "userId": "242197786063082@lid",
+    "senderPn": "916297383535@s.whatsapp.net",
+    "name": "Rising_007",
+    "isPro": false,
+    "isBanned": false,
+    "isMod": false,
+    "isMarried": false,
+    "partner": null,
+    "isStatusView": false,
+    "proposal": [],
+    "createdAt": 1761742887303
+  },
+  "68118265229540": {
+    "userId": "68118265229540@lid",
+    "senderPn": "status@broadcast",
+    "name": "Bhoomika",
+    "isPro": false,
+    "isBanned": false,
+    "isMod": false,
+    "isMarried": false,
+    "partner": null,
+    "isStatusView": false,
+    "proposal": [],
+    "createdAt": 1761742834107
+  },
+  "123545254395957": {
+    "userId": "123545254395957@lid",
+    "senderPn": "919064326949@s.whatsapp.net",
+    "name": "Ankan",
+    "isPro": false,
+    "isBanned": false,
+    "isMod": false,
+    "isMarried": false,
+    "partner": null,
+    "isStatusView": false,
+    "proposal": [],
+    "createdAt": 1761742292915
+  },
+  "163247663673414": {
+    "userId": "163247663673414@lid",
+    "senderPn": "917047584741@s.whatsapp.net",
+    "name": "< ShibamDey69 />",
+    "isPro": false,
+    "isBanned": false,
+    "isMod": false,
+    "isMarried": false,
+    "partner": null,
+    "isStatusView": false,
+    "proposal": [],
+    "createdAt": 1761742333687
+  },
+  "61169310154982": {
+    "userId": "61169310154982@lid",
+    "senderPn": "919641868398@s.whatsapp.net",
+    "name": "NIGHTMARE 🥀💔",
+    "isPro": false,
+    "isBanned": false,
+    "isMod": false,
+    "isMarried": false,
+    "partner": null,
+    "isStatusView": false,
+    "proposal": [],
+    "createdAt": 1761742490819
+  },
+  "42069288599639": {
+    "userId": "42069288599639@lid",
+    "senderPn": "916394942514@s.whatsapp.net",
+    "name": "SH7VANK",
+    "isPro": false,
+    "isBanned": false,
+    "isMod": false,
+    "isMarried": false,
+    "partner": null,
+    "isStatusView": false,
+    "proposal": [],
+    "createdAt": 1761742912270
   }
 }

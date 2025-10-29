@@ -33,22 +33,21 @@ export default {
       }
 
       let isStatus = status === "true";
-      let userId = user.split("@")[0];
-      let usr = await Neko.userDB.getUser(userId);
+      let usr = await Neko.userDB.getUser(user);
       if (usr.isStatus === isStatus) {
         return Neko.sendMentionMessage(
           M.from,
-          `User *@${userId}* is already ${isStatus ? "a status viewer" : "not a status viewer"}.`,
+          `User *@${user.split("@")[0]}* is already ${isStatus ? "a status viewer" : "not a status viewer"}.`,
           [user],
           M,
         );
       }
 
-      await Neko.userDB.setStatusView(userId, isStatus);
+      await Neko.userDB.setStatusView(user, isStatus);
       let action = isStatus ? "granted" : "revoked";
       return Neko.sendMentionMessage(
         M.from,
-        `User *@${userId}* has been ${action} status.`,
+        `User *@${user.split("@")[0]}* has been ${action} status.`,
         [user],
         M,
       );

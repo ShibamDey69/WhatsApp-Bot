@@ -15,12 +15,13 @@ const messageHandler = async (Neko, m) => {
 
     const M = await sequilizer(Neko, m);
     if (!M) return;
+
     const handleGroup = async ({ Neko, M }) => {
       if (M.isGcBanned && M.isCmd) {
         if (!M.isMod) {
           await Neko.sendTextMessage(
             M.from,
-            `This Group *${M.groupMeta?.subject}* have been banned from using this bot`,
+            `This Group *${M.groupMeta?.subject}* have been banned from using this bot`
           );
           return true;
         }
@@ -28,20 +29,20 @@ const messageHandler = async (Neko, m) => {
 
       if (M.isAntilink) {
         const gc_link = M.text?.match(
-          /chat.whatsapp.com\/([0-9A-Za-z]{20,24})/i,
+          /chat.whatsapp.com\/([0-9A-Za-z]{20,24})/i
         );
         if (gc_link) {
           if (!M.isAdmin && !M.isMod) {
             if (!M.isBotAdmin) {
               await Neko.sendTextMessage(
                 M.from,
-                "This Group has Antilink enabled. Admin access needed for bot to work.",
+                "This Group has Antilink enabled. Admin access needed for bot to work."
               );
               return true;
             }
             await Neko.sendTextMessage(
               M.from,
-              "Antilink is active in this group",
+              "Antilink is active in this group"
             );
             await Neko.sendMessage(M.from, { delete: M.key });
             await Neko.groupParticipantsUpdate(M.from, [M.sender], "remove");
@@ -82,8 +83,10 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendMessage(M.from, { delete: M.key });
           await Neko.sendMentionMessage(
             M.from,
-            `*_This is a warning! @${M.sender.split("@")[0]} if you send nsfw again! You can get kicked from this group_*`,
-            [M.sender],
+            `*_This is a warning! @${
+              M.sender.split("@")[0]
+            } if you send nsfw again! You can get kicked from this group_*`,
+            [M.sender]
           );
           return true;
         }
@@ -94,6 +97,7 @@ const messageHandler = async (Neko, m) => {
     const handleCommand = async ({ Neko, M }) => {
       try {
         if (M.mode === "private" && !M.isMod && M.isGroup) return false;
+        
         if (M.mode === "admin" && (!M.isAdmin || !M.isMod) && M.isGroup)
           return false;
         if (M.quoted.sender || M.mention[0]) {
@@ -111,7 +115,7 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendTextMessage(
             M.from,
             "This group is banned from using this bot",
-            M,
+            M
           );
           return true;
         }
@@ -121,7 +125,7 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendTextMessage(
             M.from,
             "You are banned from using the bot",
-            M,
+            M
           );
           return true;
         }
@@ -134,7 +138,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendTextMessage(
               M.from,
               "You Must Be a Mod or Pro To Use This Command In DM",
-              M,
+              M
             );
             return true;
           }
@@ -144,7 +148,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendTextMessage(
               M.from,
               "You Must Use This Command In a Group",
-              M,
+              M
             );
             return true;
           }
@@ -154,7 +158,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendTextMessage(
               M.from,
               "You Must Be the Owner To use This Command",
-              M,
+              M
             );
             return true;
           }
@@ -164,7 +168,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendTextMessage(
               M.from,
               "You Must Be an Admin To use This Command",
-              M,
+              M
             );
             return true;
           }
@@ -174,7 +178,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendTextMessage(
               M.from,
               "The Bot Must Be an Admin To use This Command",
-              M,
+              M
             );
             return true;
           }
@@ -184,7 +188,7 @@ const messageHandler = async (Neko, m) => {
             await Neko.sendTextMessage(
               M.from,
               "You Must Be a Mod To use This Command",
-              M,
+              M
             );
             return true;
           }
@@ -194,7 +198,7 @@ const messageHandler = async (Neko, m) => {
             cmd.cooldown * 1000 ?? 5000,
             cmd.run,
             Neko,
-            M,
+            M
           );
         } else {
           if (M.from) {
@@ -215,7 +219,7 @@ const messageHandler = async (Neko, m) => {
           await Neko.sendTextMessage(
             M.from,
             `An error occurred while processing your request. Please try again later. ${error}`,
-            M,
+            M
           );
           return true;
         }
@@ -225,7 +229,12 @@ const messageHandler = async (Neko, m) => {
 
     operation.attempt(async () => {
       try {
-        if (!M.sender || !M.sender.includes("@s.whatsapp.net") || !M.pushName)
+        if (
+          !M.sender ||
+          (!M.sender.includes("@s.whatsapp.net") &&
+            !M.sender.includes("@lid")) ||
+          !M.pushName
+        )
           return;
         if (M.isGroup && M.text) {
           Neko.log("message", `${M.pushName || "Bot"} | ${M.text}`, "GROUP");
@@ -240,7 +249,6 @@ const messageHandler = async (Neko, m) => {
           }))
         )
           return;
-
         if (M.isCmd && (await handleCommand({ Neko, M }))) return;
       } catch (error) {
         await handleErrors({ error, operation, Neko, M });

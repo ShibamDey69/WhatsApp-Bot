@@ -89,10 +89,10 @@ export default {
       } else if (whichUrl === "yt") {
         if (M.args.includes("--audio") || M.args.includes("-a")) {
           let yt = await YT.ytmp3(args);
-          return await Neko.sendAudioMessage(M.from, yt.audio, M);
+          return await Neko.sendAudioMessage(M.from, yt.buffer, M);
         } else {
           let yt = await YT.ytmp4(args);
-          return await Neko.sendVideoMessage(M.from, yt.video, M);
+          return await Neko.sendVideoMessage(M.from, yt.buffer, M);
         }
       } else {
         return await Neko.sendTextMessage(M.from, "*Inavlid Url Provided!*", M);

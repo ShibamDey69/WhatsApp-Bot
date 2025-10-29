@@ -17,22 +17,22 @@ const ddbClient = new DynamoDBClient({
 });
 
 const docClient = DynamoDBDocumentClient.from(ddbClient);
-
 const TABLE_NAME = "WhatsappUsers";
 
-// Cache configuration
 const userCache = new LRUCache({
-  max: 500, // store max 500 users
-  ttl: 1000 * 60 * 10, // 10 minutes
+  max: 500,
+  ttl: 1000 * 60 * 10,
 });
 
-class userDBFunc {
-  async getUser(Sender, name) {
-    if (Sender.endsWith("@g.us")) return;
+class UserDBFunc {
+  #getId(Sender) {
+    return Sender.replace("@lid", "");
+  }
 
-    const userId = Sender.replace("@s.whatsapp.net", "");
+  async getUser(Sender, senderPn, name) {
+    if (!Sender.endsWith("@lid")) return;
+    const userId = this.#getId(Sender);
 
-    // 🧠 Check cache first
     if (userCache.has(userId)) {
       return userCache.get(userId);
     }
@@ -41,7 +41,7 @@ class userDBFunc {
       new GetCommand({
         TableName: TABLE_NAME,
         Key: { userId },
-      }),
+      })
     );
 
     if (Item) {
@@ -51,7 +51,8 @@ class userDBFunc {
 
     const newUser = {
       userId,
-      username: name || "No Name Found",
+      senderPn,
+      name: name || "Unknown User",
       isPro: false,
       isBanned: false,
       isMod: false,
@@ -63,8 +64,26 @@ class userDBFunc {
     };
 
     await this.setUser(userId, newUser);
-    userCache.set(userId, newUser); // add to cache
+    userCache.set(userId, newUser);
     return newUser;
+  }
+
+  async getUserByPn(senderPn) {
+    const cached = [...userCache.values()].find(
+      (user) => user.senderPn === senderPn
+    );
+    if (cached) return cached;
+
+    const { Items } = await docClient.send(
+      new ScanCommand({
+        TableName: TABLE_NAME,
+        FilterExpression: "#pn = :pn",
+        ExpressionAttributeNames: { "#pn": "senderPn" },
+        ExpressionAttributeValues: { ":pn": senderPn },
+      })
+    );
+
+    return Items?.[0] || null;
   }
 
   async setUser(userId, data) {
@@ -72,27 +91,26 @@ class userDBFunc {
       new PutCommand({
         TableName: TABLE_NAME,
         Item: { ...data, userId },
-      }),
+      })
     );
-    userCache.set(userId, data); // update cache
+    userCache.set(userId, data);
     return data;
   }
 
-  async updateUserAttr(Sender, updates) {
-    if (Sender.endsWith("@g.us")) return;
-
-    const userId = Sender.replace("@s.whatsapp.net", "");
+  async #updateUserAttr(Sender, updates) {
+    if (!Sender.endsWith("@lid")) return;
+    const userId = this.#getId(Sender);
 
     const expressions = Object.entries(updates).map(
-      ([k], i) => `#k${i} = :v${i}`,
+      ([k], i) => `#k${i} = :v${i}`
     );
 
     const ExpressionAttributeNames = Object.fromEntries(
-      Object.keys(updates).map((k, i) => [`#k${i}`, k]),
+      Object.keys(updates).map((k, i) => [`#k${i}`, k])
     );
 
     const ExpressionAttributeValues = Object.fromEntries(
-      Object.values(updates).map((v, i) => [`:v${i}`, v]),
+      Object.values(updates).map((v, i) => [`:v${i}`, v])
     );
 
     await docClient.send(
@@ -102,15 +120,13 @@ class userDBFunc {
         UpdateExpression: `SET ${expressions.join(", ")}`,
         ExpressionAttributeNames,
         ExpressionAttributeValues,
-      }),
+      })
     );
 
-    // 🔄 Refresh cache
     const existing = userCache.get(userId) || {};
     userCache.set(userId, { ...existing, ...updates });
   }
 
-  // The rest remains unchanged...
   async filterUser(key, value) {
     const { Items } = await docClient.send(
       new ScanCommand({
@@ -118,25 +134,29 @@ class userDBFunc {
         FilterExpression: "#k = :v",
         ExpressionAttributeNames: { "#k": key },
         ExpressionAttributeValues: { ":v": value },
-      }),
+      })
     );
     return Items || [];
   }
 
   async setPro(Sender, state = true) {
-    await this.updateUserAttr(Sender, { isPro: state });
+    await this.#updateUserAttr(Sender, { isPro: state });
   }
 
   async setBanned(Sender, state = true) {
-    await this.updateUserAttr(Sender, { isBanned: state });
+    await this.#updateUserAttr(Sender, { isBanned: state });
   }
 
   async setMod(Sender, state = true) {
-    await this.updateUserAttr(Sender, { isMod: state });
+    await this.#updateUserAttr(Sender, { isMod: state });
+  }
+
+  async setStatusView(Sender, state = true) {
+    await this.#updateUserAttr(Sender, { isStatusView: state });
   }
 
   async setMarried(Sender, partner, state = true) {
-    await this.updateUserAttr(Sender, {
+    await this.#updateUserAttr(Sender, {
       isMarried: state,
       partner,
       proposal: [],
@@ -147,19 +167,15 @@ class userDBFunc {
     if (Sender.endsWith("@g.us")) return;
     const user = await this.getUser(Sender);
     const newProposal = [...(user.proposal || []), partner];
-    await this.updateUserAttr(Sender, { proposal: newProposal });
+    await this.#updateUserAttr(Sender, { proposal: newProposal });
   }
 
   async rejectProposal(Sender, partner) {
     if (Sender.endsWith("@g.us")) return;
     const user = await this.getUser(Sender);
     const newProposal = (user.proposal || []).filter((p) => p !== partner);
-    await this.updateUserAttr(Sender, { proposal: newProposal });
-  }
-
-  async setStatusView(Sender, state = true) {
-    await this.updateUserAttr(Sender, { isStatusView: state });
+    await this.#updateUserAttr(Sender, { proposal: newProposal });
   }
 }
 
-export default userDBFunc;
+export default UserDBFunc;

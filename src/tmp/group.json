@@ -1,1 +1,15 @@
-{}
+{
+  "120363418613879871": {
+    "groupId": "120363418613879871@g.us",
+    "name": "2 A.M. Frequencies ",
+    "mode": "public",
+    "isBanned": false,
+    "isAntilink": false,
+    "isWelcome": false,
+    "isReassign": false,
+    "isNsfw": false,
+    "isAntiNsfw": false,
+    "isChatAi": false,
+    "createdAt": 1761735607563
+  }
+}

@@ -69,7 +69,7 @@ export default {
       } else {
         // Direct message context: Ban the user if they are not a mod
         if (user) {
-          let usr = await Neko.userDB.getUser(user.split("@")[0]);
+          let usr = await Neko.userDB.getUser(user);
 
           if (usr.isMod) {
             return Neko.sendMentionMessage(

@@ -28,8 +28,8 @@ export default {
           M,
         );
 
-      let sender = await Neko.userDB.getUser(M.sender.split("@")[0]);
-      let receiver = await Neko.userDB.getUser(user.split("@")[0]);
+      let sender = await Neko.userDB.getUser(M.sender);
+      let receiver = await Neko.userDB.getUser(user);
 
       if (action === "accept") {
         if (

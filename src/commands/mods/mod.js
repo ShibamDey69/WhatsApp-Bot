@@ -13,7 +13,7 @@ export default {
   isMod: false,
   run: async (Neko, M) => {
     try {
-      // Determine the user to be modified and the new mod status
+
       let user = M.isMentioned ? M.mention[0] : M.quoted.sender;
       if (!user) {
         return Neko.sendTextMessage(
@@ -33,24 +33,22 @@ export default {
       }
 
       let isMod = status === "true";
-      let userId = user.split("@")[0];
-      let usr = await Neko.userDB.getUser(userId);
+      let usr = await Neko.userDB.getUser(user);
       if (usr.isMod === isMod) {
         return Neko.sendMentionMessage(
           M.from,
-          `User *@${userId}* is already ${isMod ? "a mod" : "not a mod"}.`,
+          `User *@${user.split("@")[0]}* is already ${isMod ? "a mod" : "not a mod"}.`,
           [user],
           M,
         );
       }
 
-      // Update the user's mod status
-      await Neko.userDB.setMod(userId, isMod);
-      await Neko.userDB.setPro(userId, isMod);
+      await Neko.userDB.setMod(user, isMod);
+      await Neko.userDB.setPro(user, isMod);
       let action = isMod ? "promoted to" : "demoted from";
       return Neko.sendMentionMessage(
         M.from,
-        `User *@${userId}* has been ${action} mod status.`,
+        `User *@${user.split("@")[0]}* has been ${action} mod status.`,
         [user],
         M,
       );
