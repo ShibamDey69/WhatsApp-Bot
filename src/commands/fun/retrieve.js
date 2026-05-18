@@ -25,21 +25,21 @@ export default {
         let res = await Neko.downloadMediaContent(Neko, M.quoted);
 
         if (res.mime.includes("image")) {
-          return await Neko.sendImageMessage(M.from, res.data, M);
+          return await Neko.sendImageMessage(M.sender, res.data, M);
         } else if (res.mime.includes("video")) {
-          return await Neko.sendVideoMessage(M.from, res.data, M);
+          return await Neko.sendVideoMessage(M.sender, res.data, M);
         } else if (res.mime.includes("audio")) {
-          return await Neko.sendAudioMessage(M.from, res.data, M);
+          return await Neko.sendAudioMessage(M.sender, res.data, M);
         } else {
           return await Neko.sendTextMessage(
-            M.from,
+            M.sender,
             "Unsupported file type.",
             M,
           );
         }
       } else {
         return await Neko.sendTextMessage(
-          M.from,
+          M.sender,
           "Please tag/quote a viewonce message to retreive the message.",
           M,
         );

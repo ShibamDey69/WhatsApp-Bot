@@ -15,7 +15,7 @@ export default {
     try {
       if (M.isGroup) {
         return await Neko.sendTextMessage(
-          M.from,
+          M.sender,
           "This command is only available in private chats",
           M,
         );
@@ -23,7 +23,7 @@ export default {
 
       if (!M.isStatus) {
         return await Neko.sendTextMessage(
-          M.from,
+          M.sender,
           "This command is only available in private chats... for collecting status use this command in reply of the status you want",
           M,
         );
@@ -33,19 +33,19 @@ export default {
         const media = await Neko.downloadMediaContent(Neko, M.quoted);
         switch (M?.quoted?.mtype.toLowerCase()) {
           case "audio":
-            await Neko.sendAudioMessage(M.from, media.data, M);
+            await Neko.sendAudioMessage(M.sender, media.data, M);
             break;
           case "video":
-            await Neko.sendVideoMessage(M.from, media.data, M);
+            await Neko.sendVideoMessage(M.sender, media.data, M);
             break;
           case "image":
-            await Neko.sendImageMessage(M.from, media.data, M);
+            await Neko.sendImageMessage(M.sender, media.data, M);
             break;
           case "extendedtext":
-            await Neko.sendTextMessage(M.from, media.data, M);
+            await Neko.sendTextMessage(M.sender, media.data, M);
             break;
           default:
-            await Neko.sendTextMessage(M.from, "Unsupported media type", M);
+            await Neko.sendTextMessage(M.sender, "Unsupported media type", M);
             break;
         }
       }

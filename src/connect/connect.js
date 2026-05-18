@@ -2,6 +2,8 @@ import {
   makeWASocket,
   useMultiFileAuthState,
   downloadMediaMessage,
+  Browsers,
+  makeCacheableSignalKeyStore
 } from "@whiskeysockets/baileys";
 import fs from "fs";
 import Pino from "pino";
@@ -50,13 +52,21 @@ class NekoEmit extends EventEmitter {
     const { saveCreds, state } = await useMultiFileAuthState(
       `./Auth_Info/${this.socketConfig.session}`,
     );
+
     const Neko = makeWASocket({
-      ...this.socketConfig,
-      logger,
-      auth: state,
-      browser: ["Ubuntu", "Chrome", "20.0.04"],
-      printQRInTerminal: false,
-    });
+            logger,
+            browser: Browsers.macOS('Chrome'),
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, Pino({ level: "fatal" }).child({ level: "fatal" })),
+            },
+            markOnlineOnConnect: false,
+            generateHighQualityLinkPreview: true,
+            syncFullHistory: false,
+            defaultQueryTimeoutMs: 60000,
+            connectTimeoutMs: 60000,
+            keepAliveIntervalMs: 10000,
+        });
 
     if (!Neko.authState.creds.registered) {
       setTimeout(async () => {
